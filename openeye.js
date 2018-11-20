@@ -88,7 +88,6 @@ function draw() {
     //   squares[10][10].enabled = true;
     // squares[10][10].level = 1;
 
-    // generate();
     // Continually loop through all columns and rows
     // Check for state and either trigger squares on or turn them off
     for (var i = 0; i < columns; i++) {
@@ -132,12 +131,8 @@ function draw() {
 
         // loop through the rows and disable on column 5
         for (var j = 0; j < 17; j++) {
+            //Checking if x is enabled so that we don't turn off an overlapping square
             if (!squares[5][17 - j].xEnabled) {
-                if (j == 10) {
-                    print("offender2")
-                    print(squares[5][j])
-                }
-                print("HELLO")
                 squares[5][j].level = 3;
                 squares[5][j].enabled = false;
                 board[5][j] = 0;
@@ -149,16 +144,9 @@ function draw() {
 
         // enable squares on column 5 how high the slider is raised
         for (var j = 0; j < sliderValue; j++) {
-            // print(17-j)
-            // print(sliderValue)
-            if (j == 10) {
-                print("am i getting resert?")
-                print(squares[5][j])
-            }
             squares[5][17 - j].level = 11;
             squares[5][17 - j].enabled = true;
             squares[5][17 - j].yEnabled = true;
-
         }
 
     }
@@ -166,91 +154,65 @@ function draw() {
 
     yAxisSliderValue = yAxisSlider.value() * 5;
     yAxisSliderValue2 = yAxisSlider2.value() * 5;
+    // print(collision1Active)
     // run the same calculations for the y side 
     if (!collision1Active) {
 
-        // if either y axis slider is changed go through the process again 
+        // Check if top y slider has moved
         if (previousYSliderValue1 != yAxisSliderValue) {
-            // print('IN herenow')
+            // Reset things to false so you can color active ones
             for (var j = 0; j < 48; j++) {
-
-                if (!squares[47 - j][5].xEnabled && j != 5) {
-                    squares[47 - j][5].level = 2;
-                    squares[47 - j][5].enabled = false;
-                    squares[47 - j][5].xEnabled = false;
-                    board[47 - j][5] = 0;
-                }
-                // }
-
+                squares[47 - j][5].level = 0;
+                squares[47 - j][5].enabled = false;
+                squares[47 - j][5].xEnabled = false;
             }
-
-//               // if either y axis slider is changed go through the process again 
-//         if (previousYSliderValue2 != yAxisSliderValue2) {
-//             // print('IN herenow')
-//             for (var j = 0; j < 48; j++) {
-
-//                 if (!squares[47 - j][10].xEnabled) {
-                 
-//                     squares[47 - j][10].level = 2;
-//                     squares[47 - j][10].enabled = false;
-//                     squares[47 - j][10].xEnabled = false;
-
-//                     board[47 - j][10] = 0;
-
-//                     if (j == 42) {
-
-//                         print("real offender after")
-//                         print(squares[5][10])
-//                     }
-//                 }
-//                 // }
-
-// }
-//             }
-
-
-            // print('Change')
-
-
-            // Turn on the values for yaxis (top slider)
-            for (var j = 0; j < yAxisSliderValue - 2; j++) {
-                // print(j)
-                if (j == 5) {
-
-
-                    print('enabling here')
-                    print(squares[5][j])
-                }
-                squares[j][5].level = 22;
-                squares[j][5].enabled = true;
-                board[j][5] = 1;
-                squares[j][5].xEnabled = true;
-                // print(squares[47-j][5].xEnabled)
-                if (j == 5) {
-
-
-                    print('enabled')
-                    print(squares[j][5])
-                    print("Done")
-                }
-
-            }
-
-            // for (var j = 0; j < yAxisSliderValue2 - 2; j++) {
-            //     // print("This is happening")
-            //     squares[j][10].level = 22;
-            //     squares[j][10].enabled = true;
-            //     board[j][10] = 1;
-            //     squares[j][10].xEnabled = true;
-            //     // print(squares[47-j][5].xEnabled)
-
-            // }
 
         }
+
+
+          // Turn on the values for yaxis (top slider)
+        for (var j = 0; j < yAxisSliderValue - 2; j++) {
+            squares[j][5].level = 22;
+            squares[j][5].enabled = true;
+            board[j][5] = 1;
+            squares[j][5].xEnabled = true;
+        }
+    }
+
+
+if (!collision2Active) {
+
+        //               // if either y axis slider is changed go through the process again 
+
+        if (previousYSliderValue2 != yAxisSliderValue2) {
+            print('IN herenow')
+            for (var j = 0; j < 48; j++) {
+
+                // if (!squares[47 - j][10].xEnabled) {
+
+                squares[47 - j][10].level = 0;
+                squares[47 - j][10].enabled = false;
+                squares[47 - j][10].xEnabled = false;
+
+            }
+        }
+
+
+        for (var j = 0; j < yAxisSliderValue2 - 2; j++) {
+            // print("This is happening")
+            squares[j][10].level = 22;
+            squares[j][10].enabled = true;
+            squares[j][10].xEnabled = true;
+            
+
+        }
+    }
+
+        // }
         previousYSliderValue1 = yAxisSliderValue;
         previousYSliderValue2 = yAxisSliderValue2;
 
-    }
+    
 
 }
 
@@ -270,64 +232,20 @@ function clearColor() {
 }
 // reset board when mouse is pressed
 function mouseReleased() {
-    print('squares in beginning')
-    print(squares)
+    // print('squares in beginning')
+    // print(squares)
 
     sliderValue = slider.value() * 3;
 
-
-    // this code allows for backwards movement & cleaning up
-    // if (!collision1Active) {
-    //     for (var j = 0; j < 17; j++) {
-    //         if(!squares[5][17 - j].yEnabled || !squares[5][17 - j].xEnabled) {
-    //         if (j == 5) {
-    //             print("offender1111")
-    //             print(squares[5][j])
-    //         }
-    //         squares[5][j].level = 3;
-    //         squares[5][j].enabled = false;
-    //         board[5][j] = 0;
-    //         // print(slider.value())
-    //         if(squares[5][5].xEnabled) {
-    //                     print("Changing xenabled here")
-
-
-    //         }
-    //         squares[5][17 - j].yEnabled = false;
-
-    //         }
-    //     }
-
-    //     for (var j = 0; j < sliderValue; j++) {
-    //         // print(17-j)
-    //         squares[5][17 - j].level = 11;
-    //         squares[5][17 - j].enabled = true;
-    //         squares[5][17 - j].yEnabled = true;
-    //         squares[5][17 - j].xEnabled = true;
-
-    //     }
-
-    // }
-
-    // print(squares)
-    // print(collision1Active)
-
     // Check if collision is over
-    if (collision1Active) {
+    if (collision2Active) {
+                print("Turning off collision 2")
 
-        // print("slider value" + slider.value())
-        //Update this to not be hard coded
         if (slider.value() < 5) {
-            print("Turning off collision")
+            print("Turning off collision 2 via x")
             collision1Active = false;
-            switchMatrixState(5, 5, 0);
-        }
-
-        if (yAxisSlider.value() < 2) {
-            collision1Active = false;
-            switchMatrixState(5, 5, 0);
-            // squares[5][5].level = 22;
-            // squares[5][5].enabled = true;
+            collision2Active = false;
+            switchMatrixState(5, 10, 0);
         }
 
         if (yAxisSlider2.value() < 2) {
@@ -339,107 +257,98 @@ function mouseReleased() {
             // squares[5][10].enabled = true;
         }
 
+    }
+
+    if (collision1Active) {
+
+        // print("slider value" + slider.value())
+        //Update this to not be hard coded
+        print("Turning off collision 1")
+        if (slider.value() < 5) {
+            print("Turning off collision 1 via x")
+            collision1Active = false;
+            collision2Active = false;
+            switchMatrixState(5, 5, 0);
+        }
+
+        if (yAxisSlider.value() < 2) {
+            collision1Active = false;
+            collision2Active = false;
+            switchMatrixState(5, 5, 0);
+            // squares[5][5].level = 22;
+            // squares[5][5].enabled = true;
+        }
+
 
     }
 
 
     //this is the code that turns on collisions 
-    if(!collision1Active) {
-    for (var j = 0; j < 18; j++) {
+    if (!collision1Active) {
+        for (var j = 0; j < 18; j++) {
 
-        if (squares[j][5].xEnabled && squares[j][5].yEnabled) {
-            print("IN HERE " + j)
-            collision1Active = true;
-            // collision2Active = true;
-            //turn everything off so you can setup a collision
-            for (var i = 0; i < 47 - 1; i++) {
-                squares[47 - i][5].level = 0;
-                squares[47 - i][5].enabled = false;
-                squares[47 - i][5].yEnabled = false;
+            if (squares[j][5].xEnabled && squares[j][5].yEnabled) {
+                print("IN HERE " + j)
+                collision1Active = true;
+                // collision2Active = true;
+                //turn everything off so you can setup a collision
+                for (var i = 0; i < 47 - 1; i++) {
+                    squares[47 - i][5].level = 0;
+                    squares[47 - i][5].enabled = false;
+                    squares[47 - i][5].yEnabled = false;
+
+                }
+
+
+                // turn off all default lights 'above the collision'
+                for (var i = 0; i < 17 - j - 3; i++) {
+                    print("NOW IN HERE")
+                    squares[5][i].level = 0;
+                    squares[5][i].enabled = false;
+                    squares[5][i].yEnabled = false;
+
+
+                }
+                switchMatrixState(j, 5, 1);
+                // print(squares)
 
             }
-
-
-            // turn off all default lights 'above the collision'
-            for (var i = 0; i < 17-j-3; i++) {
-                print("NOW IN HERE")
-                squares[5][i].level = 0;
-                squares[5][i].enabled = false;
-                squares[5][i].yEnabled = false;
-
-
-            }
-            switchMatrixState(j, 5, 1);
-            print(squares)
-
         }
-}
-}
+    }
 
-    //         if (!collision1Active) {
-    //     for (var j = 0; j < 17; j++) {
-    //         if(!squares[5][17 - j].yEnabled || !squares[5][17 - j].xEnabled) {
-    //         if (j == 5) {
-    //             print("offender1111")
-    //             print(squares[5][j])
-    //         }
-    //         squares[5][j].level = 3;
-    //         squares[5][j].enabled = false;
-    //         board[5][j] = 0;
-    //         // print(slider.value())
-    //         if(squares[5][5].xEnabled) {
-    //                     print("Changing xenabled here")
+    if (!collision2Active) {
+        for (var j = 0; j < 18; j++) {
 
+            if (squares[j][10].xEnabled && squares[j][10].yEnabled) {
+                print("IN HERE in collision 2 with index  " + j)
+                collision2Active = true;
+                // collision2Active = true;
+                //turn everything off so you can setup a collision
+                for (var i = 0; i < 47 - 1; i++) {
+                    squares[47 - i][10].level = 0;
+                    squares[47 - i][10].enabled = false;
+                    squares[47 - i][10].yEnabled = false;
 
-    //         }
-    //         squares[5][17 - j].yEnabled = false;
+                }
 
-    //         }
-    //     }
-
-    //     for (var j = 0; j < sliderValue; j++) {
-    //         // print(17-j)
-    //         squares[5][17 - j].level = 11;
-    //         squares[5][17 - j].enabled = true;
-    //         squares[5][17 - j].yEnabled = true;
-    //         squares[5][17 - j].xEnabled = true;
-
-    //     }
-
-    // }
-
-        // // this initiates collision 2 
-        // if (!collision2Active) {
-        //     // X and Y enabled mean that we have a collision 
-        //     if (squares[5][j].xEnabled && squares[5][j].yEnabled) {
-        //         print("ACTUALLy HERE ")
-        //         collision1Active = true;
-        //         // set everything to false on the x axis
-        //         for (var i = 0; j < 47 - i + 4; i++) {
-        //             squares[47 - i][5].level = 0;
-        //             squares[47 - i][5].enabled = false;
-        //             squares[47 - i][5].xEnabled = false;
-
-        //             // collisionsLookup['c1']['x'] = 47 - i;
-        //             // collisionsLookup['c1']['y'] = 5;
-        //             // collisionsLookup['c1']['active'] = true;
+                // turn off all default lights 'above the collision'
+                for (var i = 0; i < 17 - j + 2; i++) {
+                    print("NOW IN HERE")
+                    squares[5][i].level = 0;
+                    squares[5][i].enabled = false;
+                    squares[5][i].yEnabled = false;
 
 
-        //         }
-        //         // set everything in column 5 to be false since that is what x slider is on
-        //         for (var i = 0; i < 17 - j - 3; i++) {
-        //             squares[5][i].level = 0;
-        //             squares[5][i].enabled = false;
-        //             squares[5][i].xEnabled = false;
+                }
+                switchMatrixState(j, 10, 1);
+                // print(squares)
 
-        //         }
-        //         switchMatrixState(5, j, 1);
+            }
+        }
+    }
 
 
-        //     }
-        // }
 
-    
     print('finAL squares')
     print(squares)
 
@@ -451,6 +360,8 @@ function switchMatrixState(xCoordinate, yCoordinate, state) {
 
     if (state == 0) {
         print("switchMatrixState off")
+        print("origin is  x : " + xCoordinate + " y : " + yCoordinate)
+
         fillSquare(xCoordinate, yCoordinate, 0, 1);
         fillSquare(xCoordinate, yCoordinate, 0, 2);
         fillSquare(xCoordinate, yCoordinate, 0, 3);
@@ -507,6 +418,8 @@ function fillSquare(xCoordinate, yCoordinate, state, level) {
         offset = 7;
     }
 
+    print("origin is  x : " + xCoordinate + " y : " + yCoordinate)
+   
 
     for (x = 0; x < offset; x++) {
         xindex = xCoordinate - level + x;
@@ -517,14 +430,14 @@ function fillSquare(xCoordinate, yCoordinate, state, level) {
             if (state == 1 && !squares[xindex][yindex].enabled) {
                 squares[xindex][yindex].enabled = true;
                 squares[xindex][yindex].level = level;
-                //         stroke(0);
-                //            fill(100, 200, 255);
-                // rect(210 + (xindex * w), yindex * w, w - 1, w - 1);
+
 
             }
 
 
             if (state == 0) {
+                 print("Switching off with offset" + offset)
+                print("switching off x : " + xindex + " y : " + yindex)
                 squares[xindex][yindex].enabled = false;
                 squares[xindex][yindex].level = 0;
 
