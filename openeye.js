@@ -27,10 +27,12 @@ var collisionsLookup = {
 }
 var slider;
 var previousXSliderValue = 0;
+var previousXSliderValue2 = 0;
 var previousYSliderValue1 = 0;
 var previousYSliderValue2 = 0;
 var w = 22;
 var collision2Active = false;
+var collision3Active = false;
 
 function setup() {
     createCanvas(2000, 400);
@@ -60,6 +62,12 @@ function setup() {
         }
     }
     slider = createSlider(0, 6, 0);
+    slider.position(248, 430);
+
+    xAxisSlider2 = createSlider(0, 6, 0);
+    xAxisSlider2.position(400, 430);
+
+
     text("slider 2", 0, 30)
     yAxisSlider = createSlider(0, 10, 0);
     yAxisSlider.position(0, 20);
@@ -68,7 +76,7 @@ function setup() {
     yAxisSlider2.position(0, 200);
 
 
-    slider.position(248, 430);
+
     text("slider 1", 248, 440)
 
 }
@@ -123,33 +131,42 @@ function draw() {
 
     //Slider value is slider x axis on the bottom 
     sliderValue = slider.value() * 3;
+    xsliderValue2 = xAxisSlider2.value() * 3;
 
     // code to draw out lines, only trigger this when you've seen a change in slider values
     // in order to work within the draw function and be able to 'erase lines' we are setting all the values in the line to false
     // then we are starting fro the beginning of the slider value and setting it to true 3 at a time 
-    if (!collision1Active && previousXSliderValue != sliderValue) {
+    if (!collision1Active) {
 
         drawXSliderLine(5, sliderValue, previousXSliderValue)
+      
 
     }
     previousXSliderValue = sliderValue;
 
     yAxisSliderValue = yAxisSlider.value() * 5;
     yAxisSliderValue2 = yAxisSlider2.value() * 5;
-    
+
 
     // run the same calculations for the y side 
     if (!collision1Active) {
         // // Check if top y slider has moved
-        drawSliderLine(5, yAxisSliderValue, previousYSliderValue1)        
+        drawSliderLine(5, yAxisSliderValue, previousYSliderValue1)
 
     }
 
 
-    if (!collision2Active) {
+    if (!collision2Active && !collision3Active) {
         //               // if either y axis slider is changed go through the process again 
         drawSliderLine(10, yAxisSliderValue2, previousYSliderValue2)
 
+    }
+
+
+    if (!collision3Active) {
+        //               // if either y axis slider is changed go through the process again 
+        // print("drawing collision 3")
+            drawXSliderLine(10, xsliderValue2, previousXSliderValue2)
     }
 
     previousYSliderValue1 = yAxisSliderValue;
@@ -161,6 +178,9 @@ function draw() {
 
 
 function drawXSliderLine(xIndex, xSliderValue, previousXSlideValue) {
+
+
+    if (previousXSlideValue != xSliderValue) {
         // loop through the rows and disable on column 5
         for (var j = 0; j < 17; j++) {
             //Checking if x is enabled so that we don't turn off an overlapping square
@@ -180,6 +200,7 @@ function drawXSliderLine(xIndex, xSliderValue, previousXSlideValue) {
             squares[xIndex][17 - j].enabled = true;
             squares[xIndex][17 - j].yEnabled = true;
         }
+    }
 }
 
 
@@ -231,6 +252,28 @@ function mouseReleased() {
 
     sliderValue = slider.value() * 3;
 
+        // Check if collision is over
+    if (collision3Active) {
+        print("Turning off collision 3")
+
+        if (xAxisSlider2.value() < 5) {
+            print("Turning off collision 2 via x")
+            collision3Active = false;
+            
+            switchMatrixState(10, 10, 0);
+        }
+
+        if (yAxisSlider2.value() < 2) {
+            collision3Active = false;
+            
+            print("here")
+            switchMatrixState(10, 10, 0);
+            // squares[5][10].level = 22;
+            // squares[5][10].enabled = true;
+        }
+
+    }
+
     // Check if collision is over
     if (collision2Active) {
         print("Turning off collision 2")
@@ -279,73 +322,96 @@ function mouseReleased() {
 
     //this is the code that turns on collisions 
     if (!collision1Active) {
-        for (var j = 0; j < 18; j++) {
 
-            if (squares[j][5].xEnabled && squares[j][5].yEnabled) {
-                print("IN HERE " + j)
-                collision1Active = true;
-                // collision2Active = true;
-                //turn everything off so you can setup a collision
-                for (var i = 0; i < 47 - 1; i++) {
-                    squares[47 - i][5].level = 0;
-                    squares[47 - i][5].enabled = false;
-                    squares[47 - i][5].yEnabled = false;
-
-                }
-
-
-                // turn off all default lights 'above the collision'
-                for (var i = 0; i < 17 - j - 3; i++) {
-                    print("NOW IN HERE")
-                    squares[5][i].level = 0;
-                    squares[5][i].enabled = false;
-                    squares[5][i].yEnabled = false;
-
-
-                }
-                switchMatrixState(j, 5, 1);
-                // print(squares)
-
-            }
-        }
+        createCollision(5,5)
+    
     }
 
     //check for collisions on 2
     if (!collision2Active) {
-        for (var j = 0; j < 18; j++) {
+        createCollision(5,10)
 
-            if (squares[j][10].xEnabled && squares[j][10].yEnabled) {
-                print("IN HERE in collision 2 with index  " + j)
-                collision2Active = true;
-                // collision2Active = true;
-                //turn everything off so you can setup a collision
-                for (var i = 0; i < 47 - 1; i++) {
-                    squares[47 - i][10].level = 0;
-                    squares[47 - i][10].enabled = false;
-                    squares[47 - i][10].yEnabled = false;
+    }
 
-                }
+     if (!collision3Active) {
+        createCollision(10,10)
 
-                // turn off all default lights 'above the collision'
-                for (var i = 0; i < 17 - j + 2; i++) {
-                    print("NOW IN HERE")
-                    squares[5][i].level = 0;
-                    squares[5][i].enabled = false;
-                    squares[5][i].yEnabled = false;
-
-
-                }
-                switchMatrixState(j, 10, 1);
-                // print(squares)
-
-            }
-        }
     }
 
 
 
     print('finAL squares')
     print(squares)
+
+}
+
+var drawYIndex = 0;
+
+function createCollision(xColumnIndex,yColumnIndex) {
+
+    for (var j = 0; j < 18; j++) {
+
+        if (squares[j][yColumnIndex].xEnabled && squares[j][yColumnIndex].yEnabled && j== xColumnIndex) {
+            print("IN HERE in collision  with j  " + j)
+            print("y column" + yColumnIndex)
+                        print("x column" + xColumnIndex )
+
+
+
+            // Figure out how to set this programatically
+            if (yColumnIndex == 10 && xColumnIndex ==5 ) {
+                print('111')
+                collision2Active = true;
+                drawYIndex = 14
+                drawXIndex = 46
+            }
+
+            if (yColumnIndex == 5  && xColumnIndex ==5) {
+                print("2222")
+                collision1Active = true;
+                drawYIndex = 9
+                drawXIndex = 46
+            }
+
+            if (xColumnIndex == 10 && yColumnIndex == 10) {
+                print('3333')
+                collision3Active = true;
+                drawYIndex = 14
+                drawXIndex = 41
+            }
+
+            // collision2Active = true;
+            //turn everything off so you can setup a collision
+            for (var i = 0; i < drawXIndex; i++) {
+                squares[47 - i][yColumnIndex].level = 0;
+                squares[47 - i][yColumnIndex].enabled = false;
+                squares[47 - i][yColumnIndex].yEnabled = false;
+
+            }
+
+            // turn off all default lights 'above the collision'
+            // var drawIndex = 17 - j -4v
+            // var drawIndex = 14
+            // if(yColumnIndex == 5) {
+            //         drawIndex = 9
+
+            // }
+
+            for (var i = 0; i < drawYIndex; i++) {
+                print("starting draw from : " )
+                print(17 - j -2)
+                squares[xColumnIndex][i].level = 0;
+                squares[xColumnIndex][i].enabled = false;
+                squares[xColumnIndex][i].yEnabled = false;
+
+
+            }
+            switchMatrixState(j, yColumnIndex, 1);
+            // print(squares)
+
+        }
+    }
+
 
 }
 
