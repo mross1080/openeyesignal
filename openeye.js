@@ -4,27 +4,9 @@ var rows;
 var board;
 var squares;
 var next;
-var attackLevel = 1.0;
-var releaseLevel = 0;
-var block = false;
-var attackTime = 0.01
-var decayTime = 0.2;
-var susPercent = 0.2;
-var releaseTime = 0.6;
 
-var env, triOsc;
-env = new p5.Env();
-env.setADSR(attackTime, decayTime, susPercent, releaseTime);
-env.setRange(attackLevel, releaseLevel);
-
-triOsc = new p5.Oscillator('triangle');
-triOsc.amp(env);
-triOsc.start();
-var enabled = []
 var previousMillis = 0;
-var collisionsLookup = {
-    "c1": { 'x': 0, 'y': 0, 'active': false }
-}
+
 var slider;
 var previousXSliderValue = 0;
 var previousXSliderValue2 = 0;
@@ -37,16 +19,19 @@ var collision3Active = false;
 function setup() {
     createCanvas(2000, 400);
 
-
+  serial = new p5.SerialPort(); // make a new instance of  serialport librar    
+  // serial.on('list', printList); // callback function for serialport list event
+  // serial.on('data', serialEvent); // callback for new data coming in    
+  serial.list(); // list the serial ports
+  serial.open("/dev/cu.usbmodem14111"); // open a port
     w = 22;
     // Calculate columns and rows
     columns = 48;
     rows = 18;
     // Wacky way to make a 2D array is JS
-    board = new Array(columns);
+    
     squares = new Array(columns);
     for (var i = 0; i < columns; i++) {
-        board[i] = new Array(rows);
         squares[i] = new Array(rows);
     }
     // Going to use multiple 2D arrays and swap them
@@ -81,7 +66,7 @@ function setup() {
 
 }
 
-
+var serialString = "";
 var collision1Active = false;
 
 function draw() {
@@ -98,9 +83,14 @@ function draw() {
 
     // Continually loop through all columns and rows
     // Check for state and either trigger squares on or turn them off
+    serialString = ""
     for (var i = 0; i < columns; i++) {
         for (var j = 0; j < rows; j++) {
 
+            serial.write(i +":" + j + ":enabled;,"); // this makes it a string and adds a comma
+            serial.write(" ,"); // this makes it a string and adds a comma
+            serial.write("\n" );  
+            // serialString += i +":" + j + ":enabled;" 
             if (squares[i][j].enabled) {
 
                 if (squares[i][j].level == 1 && squares[i][j].enabled) {
@@ -172,7 +162,12 @@ function draw() {
     previousYSliderValue1 = yAxisSliderValue;
     previousYSliderValue2 = yAxisSliderValue2;
 
-
+    // print(serialString)
+      var firstValueToSend = mouseX;
+  var secondValueToSend = mouseY;
+  // serial.write(firstValueToSend + ","); // this makes it a string and adds a comma
+  // serial.write(secondValueToSend +","); // this makes it a string and adds a comma
+  // serial.write("\n" );  
 
 }
 
@@ -187,7 +182,6 @@ function drawXSliderLine(xIndex, xSliderValue, previousXSlideValue) {
             if (!squares[xIndex][17 - j].xEnabled) {
                 squares[xIndex][j].level = 3;
                 squares[xIndex][j].enabled = false;
-                board[xIndex][j] = 0;
                 // print(slider.value())
                 squares[xIndex][17 - j].yEnabled = false;
 
@@ -429,36 +423,15 @@ function switchMatrixState(xCoordinate, yCoordinate, state) {
 
     } else {
 
-        // triOsc.freq(220);
-        // env.play(triOsc, 0, 0.2);
-
-
         fillSquare(xCoordinate, yCoordinate, 1, 1);
         print("done filling");
         // setTimeout(function() {
 
         fillSquare(xCoordinate, yCoordinate, 1, 2)
-        triOsc.freq(440);
         print("done filling2 ");
-        // env.play(triOsc, 0, 0.2);
 
-
-        // }, 1000)
-        // setTimeout(function() {
         fillSquare(xCoordinate, yCoordinate, 1, 3);
-        triOsc.freq(660);
-        // env.play(triOsc, 0, 0.2);
         print("done filling3");
-
-
-        // }, 2000);
-
-        // setTimeout(function() {
-        //      clearColor();
-
-        // }, 1000);
-
-
 
     }
 
