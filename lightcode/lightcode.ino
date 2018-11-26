@@ -71,7 +71,7 @@ void setup() {
 
 
           drawRect(5, 9, 2, 2,100);
-      
+//      
       drawRect(4, 8, 4, 4,0);
       
       drawRect(3, 7, 6, 6,200);
@@ -343,10 +343,16 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 void drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
         uint16_t color) {
     startWrite();
+    Serial.println(x);
+    Serial.println(y);
     drawFastHLine(x, y, w, color);
     drawFastHLine(x, y+h-1, w, color);
-    drawFastVLine(x, y, h, color);
-    drawFastVLine(x+w-1, y, h, color);
+
+    if(w != 2 ) {
+          drawFastVLine(x, y+1, h-2, color);
+    drawFastVLine(x+w-1, y+1, h-2, color);
+      }
+
     endWrite();
 }
 
