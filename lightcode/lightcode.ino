@@ -62,34 +62,83 @@ void setup() {
   //  drawFastHLine( 10, 11,3, 200);
   //  drawFastHLine( 3, 11 ,3, 100);
   //  drawFastHLine( 17, 11,3, 0);
-//  drawFastHLine( 0, 7, 3, 20);
+  //  drawFastHLine( 0, 7, 3, 20);
   //  drawFastHLine(10,10,10 , 256);
-//    drawRect(0,0, 5, 5,20);
-//    drawRect(5, 10, 2, 2,100);
-//    drawRect(4, 9, 4, 4,0);
-//    drawRect(3, 8, 6, 6,200);
+  //    drawRect(0,0, 5, 5,20);
+  //    drawRect(5, 10, 2, 2,100);
+  //    drawRect(4, 9, 4, 4,0);
+  //    drawRect(3, 8, 6, 6,200);
 
 
-          drawRect(5, 9, 2, 2,100);
-//      
-      drawRect(4, 8, 4, 4,0);
-      
-      drawRect(3, 7, 6, 6,200);
-      
+
+//  // Square 1 info
+//    int square1Xstart = 3;
+//    int square1Ystart = 7;
+//    drawRect(5, 9, 2, 2, 100);
+//    drawRect(9, 10, 2, 2, 100);
+//    delay(500);
+//    //
 //
+//    
+//    drawRect(4, 8, 4, 4, 0);
+//        drawRect(8, 9, 4, 4, 0);
+//
+//    delay(500);
+//
+//  
+//    bool foundCollsion = false;
+//    drawRect(3, 7, 6, 6, 200);
+//    drawRect(7, 8, 6, 6, 200);
+//  delay(1000);
+//  clearAll();
+//  Serial.println("looking for collisions");
+//  //
+//    for (int ledIndex = 0; ledIndex < NUM_LEDS; ledIndex++) {
+//      if (ledLookup[ledIndex]) {
+//        foundCollsion = true;
+//  
+//  
+//        leds[ledIndex]  = CRGB::Orange;
+//  
+//      }
+//  
+//  
+//    }
+//  
+//    delay(1000);
+//  
+//    FastLED.show();
+//  
+//    if (foundCollsion) {
+//      Serial.println("prointin coll");
+//      //    fillRect(3, 7, 9, 7, 150);
+//  
+//    }
+  //
+  //
+  //  for (int ledIndex = 3; ledIndex > 0; ledIndex--) {
+  //     drawFastVLine(square1Xstart+ ledIndex, square1Ystart+1, 5, 220);
+  //     drawFastVLine(square1Xstart+ ledIndex, square1Ystart+1, 5, 220);
+  //     FastLED.show();
+  //     delay(500);
+  //
+  //  }
+  //  drawFastVLine( 4, 8, 5, 220);
+  FastLED.show();
+  //            drawRect(7, 8, 6, 6,200);
+  //
+  //} else {
+  //
+  //  Serial.println("No collisions");
+  //}
+//  delay(15000);
 
-      
 
-        drawRect(9, 10, 2, 2,100);
-      
-      drawRect(8, 9, 4, 4,0);
-      
-      drawRect(7, 8, 6, 6,200);
-      delay(500);
+  //       drawFastHLine( 3, 8,9, 200);
 
 
 
-      
+
   //
   //leds[ XY(0, 0)]  = CHSV( pixelHue, 255, 255);
   //leds[ XY(1, 0)]  = CHSV( pixelHue, 255, 255);
@@ -103,6 +152,9 @@ void setup() {
 int xValue = 5;
 int c2 = 10;
 int yValue2 = 2;
+int sensorValue;
+int previousValue=0;
+int mappedPotValue;
 void loop() {
   // put your main code here, to run repeatedly:
   int xValue = random(3, 17);
@@ -112,28 +164,52 @@ void loop() {
   FastLED.delay(1000 / FRAMES_PER_SECOND);
   int x2 = random(0, kMatrixWidth);
   int y2 = random(0, kMatrixHeight);
-//  //
-//    for (int x = 0; x < 5; x++) {
-//      int offSet = 3* x;
-////      drawFastVLine( 10, 14-offSet, offSet, 200);
-////      drawFastVLine( 3, 14-offSet , offSet, 100);
-////      drawFastVLine( 17, 14-offSet, offSet, 0);
-////      drawFastHLine( 0, 4, offSet, 50);
-////      drawFastHLine( 0, 9, offSet, 80);
-//      drawRect(5, 10, 2, 2,100);
-//      delay(500);
-//      drawRect(4, 9, 4, 4,0);
-//      delay(500);
-//      drawRect(3, 8, 6, 6,200);
-//      delay(500);
-//      
-//     
-//      clearAll();
-//  
-//    }
+  //  //
+  sensorValue = analogRead(A0);  
+  mappedPotValue = map(sensorValue,0,1023,3,18);
+  if (mappedPotValue != previousValue ) {
+    
+    previousValue = mappedPotValue;
+    
+    
+    
+    
+    
+ 
+  Serial.println(mappedPotValue);
+
+//  //Square echo animation
+  for (int x = 0; x < mappedPotValue; x++) {
+    int offSet = 3 * x;
+    drawRect(x, 10, 2, 2, 100);
+    delay(500);
 
 
 
+    clearAll();
+
+  }
+
+
+
+
+//  //Square echo animation
+  for (int x = 0; x < 2; x++) {
+    int offSet = 3 * x;
+    drawRect(mappedPotValue, 10, 2, 2, 100);
+    delay(500);
+    drawRect(mappedPotValue-1, 9, 4, 4, 0);
+    delay(500);
+    drawRect(mappedPotValue-2, 8, 6, 6, 200);
+    delay(500);
+
+
+    clearAll();
+
+  }
+
+
+  }
   //  for(int x = 3; x < 17; x++) {
   //
   //        drawCircle(x, 3, 17, 17-x , 3, random(0, 255));
@@ -181,7 +257,7 @@ void loop() {
   //  yValue2++;
   //  xValue +=3;
   //  drawCircle(5,5,5,random(0,255));
-  //  delay(1000);
+//    delay(1000);
 
 }
 
@@ -210,46 +286,19 @@ void writePixel(int x, int y, int pixelHue) {
 }
 
 
-void drawInitialCirclePoints(int16_t x0, int16_t y0, int16_t r, uint16_t color) {
-  writePixel(x0  , y0 + r, color);
-  writePixel(x0  , y0 - r, color);
-  writePixel(x0 + r, y0  , color);
-  writePixel(x0 - r, y0  , color);
-
-
-}
-
-void drawFullCirclePoints(int16_t x0, int16_t y0, int16_t x, int16_t y, uint16_t color) {
-
-  writePixel(x0 + x, y0 + y, color);
-  writePixel(x0 - x, y0 + y, color);
-  writePixel(x0 + x, y0 - y, color);
-  writePixel(x0 - x, y0 - y, color);
-  writePixel(x0 + y, y0 + x, color);
-  writePixel(x0 - y, y0 + x, color);
-  writePixel(x0 + y, y0 - x, color);
-  writePixel(x0 - y, y0 - x, color);
-
-
-}
-
-
-
-
-
-
 bool pixelHasValue(int pixel) {
-//  return true;
-//  Serial.println(leds[pixel].blue);
-  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0; 
-//  return true;
-  
-  }
+  //  return true;
+  //  Serial.println(leds[pixel].blue);
+  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
+  //  return true;
+
+}
 
 
 
-void writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
+bool writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
                int pixelHue, char direction) {
+  bool triggeredCollision = false;
   int16_t steep = abs(y1 - y0) > abs(x1 - x0);
   if (steep) {
     _swap_int16_t(x0, y0);
@@ -261,71 +310,30 @@ void writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
     _swap_int16_t(y0, y1);
   }
 
-  int16_t dx, dy;
-  dx = x1 - x0;
-  dy = abs(y1 - y0);
-
-  int16_t err = dx / 2;
-  int16_t ystep;
-
-  if (y0 < y1) {
-    ystep = 1;
-  } else {
-    ystep = -1;
-  }
-
   for (; x0 <= x1; x0++) {
     int ledLocation = (direction == 'v') ? XY(y0, x0) : XY(x0, y0);
-    if(pixelHasValue(ledLocation)) {
-        leds[ledLocation]  = CHSV( 120, 255, 255);
-      
-      } else {
-        
-        leds[ledLocation]  = CHSV( pixelHue, 255, 255);
-        }
-    
-
-    
-//    if (steep) {
-//      Serial.println("Writing");
-//      Serial.println(y0);
-//      Serial.println(x0);
-      //            writePixel(y0, x0, color);
-//      if (direction == 'v') {
-//        leds[ XY(y0, x0)]  = CHSV( pixelHue, 255, 255);
-////        Serial.println(pixelHasValue(x0));
-//        Serial.print("gr value");
-////                  Serial.println(leds[ XY(y0, x0)][0]);
-//Serial.println(pixelHasValue(x0));
-//                  Serial.println(leds[ XY(y0, x0)].green);
-//
-//
-//      } else {
-//        leds[ XY(x0, y0)]  = CHSV( pixelHue, 255, 255);
-//        
-//        Serial.println(leds[ XY(y0, x0)].blue);
-//                Serial.println(leds[ XY(x0, y0)].green);
-//                Serial.println(pixelHasValue(x0));
-////
-////          Serial.println("horizontal");
-//
-//      }
+    if (pixelHasValue(ledLocation)) {
+      ledLookup[ledLocation] = true;
+      //      leds[ledLocation]  = CHSV( 120, 255, 255);
+      //        ledLookup[ledLocation] = true;
+      triggeredCollision = true;
 
     }
-    err -= dy;
-    if (err < 0) {
-      y0 += ystep;
-      err += dx;
-    }
-    FastLED.show();
-//  }
+
+    leds[ledLocation]  = CHSV( pixelHue, 255, 255);
+
+
+  }
+
+  return triggeredCollision;
+  //  }
 }
 
 void drawFastVLine(int16_t x, int16_t y,
                    int16_t h, uint16_t color) {
   startWrite();
-  writeLine(x, y, x, y + h - 1, color,'v');
-  endWrite();
+  writeLine(x, y, x, y + h - 1, color, 'v');
+  //  endWrite();
 }
 
 void fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
@@ -340,28 +348,37 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h,
 
 
 
-void drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
-        uint16_t color) {
-    startWrite();
-    Serial.println(x);
-    Serial.println(y);
-    drawFastHLine(x, y, w, color);
-    drawFastHLine(x, y+h-1, w, color);
+bool drawRect(int16_t x, int16_t y, int16_t w, int16_t h,
+              uint16_t color) {
+  startWrite();
+  bool col = false;
+  //    Serial.println(x);
+  //    Serial.println(y);
+  col = drawFastHLine(x, y, w, color);
+  drawFastHLine(x, y + h - 1, w, color);
 
-    if(w != 2 ) {
-          drawFastVLine(x, y+1, h-2, color);
-    drawFastVLine(x+w-1, y+1, h-2, color);
-      }
 
-    endWrite();
+  if (w != 2 ) {
+    drawFastVLine(x, y + 1, h - 2, color);
+    drawFastVLine(x + w - 1, y + 1, h - 2, color);
+  }
+
+
+
+
+  endWrite();
+
+  return col;
 }
 
 
 
 
-void drawFastHLine(int16_t x, int16_t y,
+bool drawFastHLine(int16_t x, int16_t y,
                    int16_t w, uint16_t color) {
   startWrite();
-  writeLine(x, y, x + w - 1, y, color,'h');
-  endWrite();
+  bool col = writeLine(x, y, x + w - 1, y, color, 'h');
+
+  //  endWrite();
+  return col;
 }
