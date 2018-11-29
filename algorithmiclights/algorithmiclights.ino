@@ -14,6 +14,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    280
 CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
+
 const uint8_t kMatrixWidth = 20;
 const uint8_t kMatrixHeight = 14;
 const bool    kMatrixSerpentineLayout = true;
@@ -67,11 +68,20 @@ class Echo {
         }
       }
     }
+
+
+    void drawEchoAnimation(){
+      
+      
+      
+      
+      }
       
       
 };
-
+Echo echoLookup[7];
 Echo *echo = new Echo();
+Echo *echo2 = new Echo();
 
 
 
@@ -90,7 +100,7 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-
+//
   fillSquare(3, 3, 1);
   delay(1000);
   fillSquare(3, 3, 2);
@@ -99,15 +109,19 @@ void setup() {
 }
 
 void loop() {
+//  Echo echoLookup[2];
   // put your main code here, to run repeatedly:
   FastLED.show();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
-   fillSquare(3, 3, 1);
-  delay(1000);
-  fillSquare(3, 3, 2);
-  delay(1000);
-  fillSquare(3, 3, 3);
+//   fillSquare(3, 3, 1,echo->echoLeds);
+//   fillSquare(8, 8, 1,echo2->echoLeds);
+//  delay(1000);
+//  fillSquare(3, 3, 2);
+//  fillSquare(8, 8  2,echo2);
+//  delay(1000);
+//  fillSquare(3, 3, 3);
+//  fillSquare(8, 8, 2, echo2);
   delay(1000);
   Serial.println("going again");
   echo->clearPixels();
@@ -115,70 +129,43 @@ void loop() {
 }
 
 
-int xindex;
-int yindex;
-void fillSquare(int xCoordinate, int  yCoordinate,  int level) {
-
-  int offset = 0;
-  if (level == 1) {
-
-    offset = 3;
-
-  } else if (level == 2) {
-    offset = 5;
-
-  } else if (level == 3) {
-
-    offset = 7;
-  }
-
-  for (int x = 0; x < offset; x++) {
-    xindex = xCoordinate - level + x;
+//int xindex;
+//int yindex;
+//void fillSquare(int xCoordinate, int  yCoordinate,  int level) {
+//  int pixelHue = random(0,255);
+//  int offset = 0;
+//  if (level == 1) {
+//
+//    offset = 3;
+//
+//  } else if (level == 2) {
+//    offset = 5;
+//
+//  } else if (level == 3) {
+//
+//    offset = 7;
+//  }
+//
+//  for (int x = 0; x < offset; x++) {
+//    xindex = xCoordinate - level + x;
 //    Serial.print("X : ");
 //    Serial.println(xindex);
-    for (int i = 0; i < offset; i++) {
-      yindex = yCoordinate - level + i;
+//    for (int i = 0; i < offset; i++) {
+//      yindex = yCoordinate - level + i;
 //      Serial.print("Y : ");
 //      Serial.println(yindex);
-      int ledLocation = XY(xindex, yindex);
-
-      if (echo->echoLeds[xindex][yindex] == NULL) {
-        Serial.println("turning on lights");
-        leds[ledLocation]  = CHSV( random(0, 255), 200, 200);
-        echo->echoLeds[xindex][yindex] = 1;
-
-      }
-
-    }
-  }
-  FastLED.show();
-}
+//      int ledLocation = XY(xindex, yindex);
 //
+//      if (echo->echoLeds[xindex][yindex] == NULL) {
+//        Serial.println("turning on lights");
+//        leds[ledLocation]  = CHSV(pixelHue, 200, 200);
+//        echo->echoLeds[xindex][yindex] = 1;
 //
-//            if (state == 1 && !squares[xindex][yindex].enabled) {
-//                squares[xindex][yindex].enabled = true;
-//                squares[xindex][yindex].level = level;
-//                //         stroke(0);
-//                //            fill(100, 200, 255);
-//                // rect(210 + (xindex * w), yindex * w, w - 1, w - 1);
+//      }
 //
-//            }
-
 //    }
-
-
-//    Serial.println("filling");
-//    Serial.println(XY(xCoordinate - 1, yCoordinate));
-//    Serial.println(XY(xCoordinate - offset, yCoordinate - offset));
-//    //  int ledLocation = XY(xCoordinate, yCoordinate);
-//    //  leds[XY(xCoordinate - offset, yCoordinate)]  = CHSV( 200, 200, 200);
-//    //  leds[XY(xCoordinate - offset, yCoordinate + offset)]  = CHSV(200, 200, 200);
-//    //  leds[XY(xCoordinate - offset, yCoordinate - offset)]  = CHSV( 200, 200, 200);
-//    //  leds[XY(xCoordinate, yCoordinate - offset)]  = CHSV(200, 200, 200);
-//    //  leds[XY(xCoordinate, yCoordinate + offset)]  = CHSV( random(0, 255), 200, 200);
-//    //  leds[XY(xCoordinate + offset, yCoordinate - offset)]  = CHSV( random(0, 255), 200, 200);
-//    //  leds[XY(xCoordinate + offset, yCoordinate)]  = CHSV( random(0, 255), 200, 200);
-//    //  leds[XY(xCoordinate + offset, yCoordinate + offset)]  = CHSV( random(0, 255), 200, 200);
 //  }
+//  FastLED.show();
 //}
+//
 
