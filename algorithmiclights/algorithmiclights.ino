@@ -147,16 +147,19 @@ class Echo {
 
 
 };
-Echo echoLookup[7];
-Echo *echo = new Echo(5, 3);
-Echo *echo2 = new Echo(10, 7);
-Echo *echo3 = new Echo(14,10);
+//Echo echoLookup[7];
+//Echo *echo = new Echo(5, 3);
+//Echo *echo2 = new Echo(10, 7);
+//Echo *echo3 = new Echo(14, 10);
 //Echo *echo4 = new Echo(4,10);
 
 
 
 void setup() {
-  Serial.println(echo->originX);
+  createEcho( 0, 6, 4);
+  createEcho( 1, 13, 7);
+  createEcho( 2, 3, 10);
+//  Serial.println(echo->originX);
   // put your setup code here, to run once:
   int pixelHue = 200;
   // put your setup code here, to run once:
@@ -176,6 +179,7 @@ void setup() {
   //  fillSquare(3, 3, 2);
   //  delay(1000);
   //  fillSquare(3, 3, 3);
+
 }
 
 void loop() {
@@ -193,16 +197,21 @@ void loop() {
   //  delay(1000);
   //  fillSquare(3, 3, 3);
   //  fillSquare(8, 8, 2, echo2);
-  echo->drawEchoAnimation(currentMillis);
-  echo2->drawEchoAnimation(currentMillis);
-    echo3->drawEchoAnimation(currentMillis);
-//    echo4->drawEchoAnimation(currentMillis);
+  //  echo->drawEchoAnimation(currentMillis);
+
+  drawEchoAnimation(0);
+  drawEchoAnimation(1);
+  drawEchoAnimation(2);
+  //  echo2->drawEchoAnimation(currentMillis);
+  //  echo3->drawEchoAnimation(currentMillis);
+  //    echo4->drawEchoAnimation(currentMillis);
   delay(400);
   Serial.println("going again");
-  for (int index = 0; index < 7; index++) {
-    for (int compareIndex = 0; compareIndex < 7; compareIndex++) {
+  for (int index = 0; index < 3; index++) {
+    for (int compareIndex = 0; compareIndex < 3; compareIndex++) {
       if (index != compareIndex) {
-        if (echoLookup[index].compareMinMax(echoLookup[compareIndex].minimumX, echoLookup[compareIndex].minimumY, echoLookup[compareIndex].offset)) {
+        if (compareMinMax(index, compareIndex)) {
+          //        if (echoLookup[index].compareMinMax(echoLookup[compareIndex].minimumX, echoLookup[compareIndex].minimumY, echoLookup[compareIndex].offset)) {
           Serial.println("!!!!!!!!!!!");
 
 
@@ -220,43 +229,102 @@ void loop() {
 }
 
 
-//int xindex;
-//int yindex;
-//void fillSquare(int xCoordinate, int  yCoordinate,  int level) {
-//  int pixelHue = random(0,255);
-//  int offset = 0;
-//  if (level == 1) {
-//
-//    offset = 3;
-//
-//  } else if (level == 2) {
-//    offset = 5;
-//
-//  } else if (level == 3) {
-//
-//    offset = 7;
-//  }
-//
-//  for (int x = 0; x < offset; x++) {
-//    xindex = xCoordinate - level + x;
-//    Serial.print("X : ");
-//    Serial.println(xindex);
-//    for (int i = 0; i < offset; i++) {
-//      yindex = yCoordinate - level + i;
-//      Serial.print("Y : ");
-//      Serial.println(yindex);
-//      int ledLocation = XY(xindex, yindex);
-//
-//      if (echo->echoLeds[xindex][yindex] == NULL) {
-//        Serial.println("turning on lights");
-//        leds[ledLocation]  = CHSV(pixelHue, 200, 200);
-//        echo->echoLeds[xindex][yindex] = 1;
-//
-//      }
-//
-//    }
-//  }
-//  FastLED.show();
-//}
-//
+int offsetLookup [3];
+int echoCounters[3];
+int xAxisEchoOrigin[3];
+int xAxisEchoMinimum[3];
+int yAxisEchoOrigin[3];
+//int xAxisEchoMinimum[3];
+
+bool compareMinMax(int echo1Index, int echo2Index) {
+  int echo1x = xAxisEchoOrigin[echo1Index];
+  int echo1y = xAxisEchoOrigin[echo1Index];
+  int echo2x = xAxisEchoOrigin[echo2Index];
+  int echo2y = xAxisEchoOrigin[echo2Index];
+
+  int echo1xMax = echo1x + 3;
+  int echo1yMax = echo1x + 3;
+  return true;
+
+}
+
+void drawEchoAnimation(int echoLookupIndex) {
+  int counter = echoCounters[echoLookupIndex];
+
+  if (counter <= 3 ) {
+    fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
+    echoCounters[echoLookupIndex]++;
+
+  } else {
+    clearPixels(echoLookupIndex);
+  }
+
+}
+
+bool pixelHasValue(int pixel) {
+
+  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
+
+}
+int offset = 0;
+
+void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int level) {
+  int pixelHue = random(0, 255);
+
+  if (level == 1) {
+
+    offset = 3;
+
+  } else if (level == 2) {
+    offset = 5;
+
+  } else if (level == 3) {
+
+    offset = 7;
+  }
+  Serial.print("offset : ");
+  Serial.println(offset);
+
+  for (int x = 0; x < offset; x++) {
+    int xindex = xCoordinate - level + x;
+    //    Serial.print("X : ");
+    //    Serial.println(xindex);
+    for (int i = 0; i < offset; i++) {
+      int yindex = yCoordinate - level + i;
+      //      Serial.print("Y : ");
+      //      Serial.println(yindex);
+      int ledLocation = XY(xindex, yindex);
+
+      if (!pixelHasValue(ledLocation)) {
+        Serial.println("turning on lights");
+        leds[ledLocation]  = CHSV(pixelHue, 200, 200);
+
+      }
+
+    }
+  }
+
+}
+
+
+
+
+void createEcho(int index, int x, int y) {
+  xAxisEchoOrigin[index] = x;
+  yAxisEchoOrigin[index] = y;
+  echoCounters[index] = 1;
+
+}
+
+
+void clearPixels(int index) {
+  echoCounters[index] = 1;
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      leds[XY(x, y)]  = CHSV( 0, 0, 0);
+      //      echoLeds[x][y] = NULL;
+
+    }
+  }
+}
 
