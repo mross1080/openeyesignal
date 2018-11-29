@@ -21,6 +21,14 @@ const uint8_t kMatrixWidth = 20;
 const uint8_t kMatrixHeight = 14;
 const bool    kMatrixSerpentineLayout = true;
 
+
+class Echo {
+  public:
+    int originX;
+    int originY;
+};
+
+
 uint16_t XY( uint8_t x, uint8_t y)
 {
   uint16_t i;
@@ -71,49 +79,49 @@ void setup() {
 
 
 
-//  // Square 1 info
-//    int square1Xstart = 3;
-//    int square1Ystart = 7;
-//    drawRect(5, 9, 2, 2, 100);
-//    drawRect(9, 10, 2, 2, 100);
-//    delay(500);
-//    //
-//
-//    
-//    drawRect(4, 8, 4, 4, 0);
-//        drawRect(8, 9, 4, 4, 0);
-//
-//    delay(500);
-//
-//  
-//    bool foundCollsion = false;
-//    drawRect(3, 7, 6, 6, 200);
-//    drawRect(7, 8, 6, 6, 200);
-//  delay(1000);
-//  clearAll();
-//  Serial.println("looking for collisions");
-//  //
-//    for (int ledIndex = 0; ledIndex < NUM_LEDS; ledIndex++) {
-//      if (ledLookup[ledIndex]) {
-//        foundCollsion = true;
-//  
-//  
-//        leds[ledIndex]  = CRGB::Orange;
-//  
-//      }
-//  
-//  
-//    }
-//  
-//    delay(1000);
-//  
-//    FastLED.show();
-//  
-//    if (foundCollsion) {
-//      Serial.println("prointin coll");
-//      //    fillRect(3, 7, 9, 7, 150);
-//  
-//    }
+  //  // Square 1 info
+  //    int square1Xstart = 3;
+  //    int square1Ystart = 7;
+  //    drawRect(5, 9, 2, 2, 100);
+  //    drawRect(9, 10, 2, 2, 100);
+  //    delay(500);
+  //    //
+  //
+  //
+  //    drawRect(4, 8, 4, 4, 0);
+  //        drawRect(8, 9, 4, 4, 0);
+  //
+  //    delay(500);
+  //
+  //
+  //    bool foundCollsion = false;
+  //    drawRect(3, 7, 6, 6, 200);
+  //    drawRect(7, 8, 6, 6, 200);
+  //  delay(1000);
+  //  clearAll();
+  //  Serial.println("looking for collisions");
+  //  //
+  //    for (int ledIndex = 0; ledIndex < NUM_LEDS; ledIndex++) {
+  //      if (ledLookup[ledIndex]) {
+  //        foundCollsion = true;
+  //
+  //
+  //        leds[ledIndex]  = CRGB::Orange;
+  //
+  //      }
+  //
+  //
+  //    }
+  //
+  //    delay(1000);
+  //
+  //    FastLED.show();
+  //
+  //    if (foundCollsion) {
+  //      Serial.println("prointin coll");
+  //      //    fillRect(3, 7, 9, 7, 150);
+  //
+  //    }
   //
   //
   //  for (int ledIndex = 3; ledIndex > 0; ledIndex--) {
@@ -131,7 +139,7 @@ void setup() {
   //
   //  Serial.println("No collisions");
   //}
-//  delay(15000);
+  //  delay(15000);
 
 
   //       drawFastHLine( 3, 8,9, 200);
@@ -153,117 +161,194 @@ int xValue = 5;
 int c2 = 10;
 int yValue2 = 2;
 int sensorValue;
-int previousValue=0;
+int previousValue = 0;
 int mappedPotValue;
+bool foundCollision = false;
+bool square1BloomEcho1 = false;
+bool square1BloomEcho2 = false;
+bool square1BloomEcho3 = false;
+long previousMillis = 0;
+bool startNextLoop = true;
+long prevDelta = 0;
 void loop() {
   // put your main code here, to run repeatedly:
+//  delay(1000);
+unsigned long currentMillis = millis();
   int xValue = random(3, 17);
-  if (yValue2 > 10) {
-    yValue2 = 2;
-  }
+
   FastLED.delay(1000 / FRAMES_PER_SECOND);
   int x2 = random(0, kMatrixWidth);
   int y2 = random(0, kMatrixHeight);
   //  //
-  sensorValue = analogRead(A0);  
-  mappedPotValue = map(sensorValue,0,1023,3,18);
-  if (mappedPotValue != previousValue ) {
+  sensorValue = analogRead(A0);
+  int mappedPotValue1 = map(sensorValue, 0, 1023, 3, 18);
+
+  mappedPotValue = 5;
+
+  if (abs(mappedPotValue1 -  previousValue) > 3 && yValue2 != 2) {
+    yValue2 = 2;
+    Serial.println("IN HERE");
+    square1BloomEcho1 = false;
+    square1BloomEcho2 = false;
+    square1BloomEcho3 = false;
+    previousMillis = currentMillis;
+    clearAll();
+leds[200]  = CHSV( random(0,255), 200, 200);
+    previousValue =mappedPotValue1;
+
+
+
+
+  }
+
+  if (yValue2 == 2 ) {
+    Serial.println("starting");
+
+//    previousValue = mappedPotValue;
+
+    //  Serial.println(mappedPotValue);
+
+    //  //Square echo animation
+    //  for (int x = 0; x < mappedPotValue; x++) {
+    //    int offSet = 3 * x;
+    //    drawRect(x, 10, 2, 2, 100);
+    //    delay(500);
+    //
+    //
+    //
+    //    clearAll();
+    //
+    //  }
+
+
+    //  for (int y = 12; y > 5; y--) {
+    ////    int offSet = 3 * x;
+    //Serial.println(y);
+    //    drawRect(10, y, 2, 2, 100);
+    //    delay(500);
+    //
+    //
+    //
+    //    clearAll();
+    //
+    //  }
+
     
-    previousValue = mappedPotValue;
-    
-    
-    
-    
-    
+   long timeDelta;
+        Serial.print("Current millis : ");
+    Serial.println(currentMillis);
+         Serial.print("previous millis : ");
+    Serial.println(previousMillis);
+       timeDelta = (currentMillis - previousMillis) - 3018;
+       Serial.print("Time difference : ");
+    Serial.println(timeDelta);
+    if (!square1BloomEcho1) {
+      Serial.println("going into first draw");
+
+      drawRect(10, 5, 2, 2, 90);
+      drawRect(7, 3, 2, 2, 100);
+//      Serial.println(timeDelta);
+      square1BloomEcho1 = true;
+      //      prevDelta = timeDelta +
  
-  Serial.println(mappedPotValue);
-
-//  //Square echo animation
-  for (int x = 0; x < mappedPotValue; x++) {
-    int offSet = 3 * x;
-    drawRect(x, 10, 2, 2, 100);
-    delay(500);
 
 
+    }
 
-    clearAll();
+
+    if (square1BloomEcho1 && !square1BloomEcho2 && timeDelta > 1300 ) {
+    Serial.println("Second draw");
+      drawRect(9, 4, 4, 4, 0);
+      drawRect(6, 2, 4, 4, 0);
+      square1BloomEcho2 = true;
+
+
+    }
+    //
+    if (timeDelta > 2000  && square1BloomEcho2 && !square1BloomEcho3 ) {
+
+      drawRect(10 - 2, 3, 6, 6, 200);
+      drawRect(5, 1, 6, 6, 200);
+      square1BloomEcho3 = true;
+//      previousMillis = currentMillis;
+
+
+
+    }
+
+
+
+    if (timeDelta > 2500) {
+                
+      //          clearAll();
+      startNextLoop = false;
+      for (int ledIndex = 0; ledIndex < NUM_LEDS; ledIndex++) {
+        if (ledLookup[ledIndex]) {
+          foundCollision = true;
+
+
+          leds[ledIndex]  = CRGB::Orange;
+
+        }
+
+
+      }
+      Serial.println("done");
+      yValue2 = 10;
+
+
+    }
+
+
+
+
+
+
+    //    for (int x = 0; x < 2; x++) {
+    //    int offSet = 3 * x;
+    //    drawRect(10, 5, 2, 2, 100);
+    //    delay(500);
+    //    drawRect(10-1, 4, 4, 4, 0);
+    //    delay(500);
+    //    drawRect(10-2, 3, 6, 6, 200);
+    //    delay(500);
+    //
+    //
+    //    clearAll();
+    //
+    //  }
+
+
+
+
+
+    //  //Square echo animation
+    //  for (int x = 0; x < 2; x++) {
+    //    int offSet = 3 * x;
+    //    drawRect(mappedPotValue, 10, 2, 2, 100);
+    //    delay(500);
+    //    drawRect(mappedPotValue-1, 9, 4, 4, 0);
+    //    delay(500);
+    //    drawRect(mappedPotValue-2, 8, 6, 6, 200);
+    //    delay(500);
+    //
+    //
+    //    clearAll();
+    //
+    //  }
+
 
   }
 
 
 
-
-//  //Square echo animation
-  for (int x = 0; x < 2; x++) {
-    int offSet = 3 * x;
-    drawRect(mappedPotValue, 10, 2, 2, 100);
-    delay(500);
-    drawRect(mappedPotValue-1, 9, 4, 4, 0);
-    delay(500);
-    drawRect(mappedPotValue-2, 8, 6, 6, 200);
-    delay(500);
-
-
-    clearAll();
-
-  }
-
-
-  }
-  //  for(int x = 3; x < 17; x++) {
-  //
-  //        drawCircle(x, 3, 17, 17-x , 3, random(0, 255));
-  ////          delay(100);
-  ////        drawCircle(x, 3, 17, 17-x , 2, random(0, 255));
-  ////  delay(100);
-  ////  drawCircle(x, 4, x, 9 , 3, random(0, 255));
-  //
-  ////    delay(100);
-  //    clearAll();
-  //    }
-  //
-  //
-  //    for(int x = 17; x > 3; x--) {
-  //
-  //        drawCircle(x, 3, 17, 17-x , 3, random(0, 255));
-  ////          delay(100);
-  //        drawCircle(x, 3, 17, 17-x , 2, random(0, 255));
-  ////  delay(100);
-  ////  drawCircle(x, 4, x, 9 , 3, random(0, 255));
-  //
-  //    delay(100);
-  //    clearAll();
-  //    }
-
-
-
-
-  //  drawCircle(xValue,yValue2,2,random(0,255));
-
-  //  drawCircle(c2,yValue2,1,random(0,255));
-
-  //  drawCircle(xValue,5,2,random(0,255));
-  ////  drawCircle(c2,yValue2,2,random(0,255));
-  ////
-  // delay(500);
-  //  drawCircle(xValue,5,3,random(0,255));
-  //////  drawCircle(c2,yValue2,3,random(0,255));
-  //  delay(500);
-  //  drawCircle(xValue,5,4,random(0,255));
-  ////  delay(10);
-  //////  drawCircle(c2,yValue2,4,random(0,255));
-  //  delay(200);
-  ////  clearAll();
-  //  yValue2++;
-  //  xValue +=3;
-  //  drawCircle(5,5,5,random(0,255));
-//    delay(1000);
 
 }
 
 void clearAll() {
   for (int16_t i = 0; i < NUM_LEDS; i++) {
     leds[i]  = CHSV( 0, 0, 0);
+    ledLookup[i] = false;
   }
 
 }
@@ -314,9 +399,11 @@ bool writeLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1,
     int ledLocation = (direction == 'v') ? XY(y0, x0) : XY(x0, y0);
     if (pixelHasValue(ledLocation)) {
       ledLookup[ledLocation] = true;
+      Serial.print("overlap at :");
+      Serial.println(ledLocation);
       //      leds[ledLocation]  = CHSV( 120, 255, 255);
       //        ledLookup[ledLocation] = true;
-      triggeredCollision = true;
+      //      triggeredCollision = true;
 
     }
 
