@@ -54,7 +54,7 @@ void setup() {
   // 2 is coming from x axis and is closest to the left
   createEcho( 2, 4, 3, 'x');
   // 3 is coming from the x axis and is in the middle
-  createEcho( 3, 9, 8, 'x');
+  createEcho( 3, 9, 13, 'x');
 
   // 4is coming from the x axis and is closest to the right
   createEcho( 4, 14, 10, 'x');
@@ -80,7 +80,9 @@ void setup() {
 //long previousMillis = 0;
 
 int previousValue1 = 0;
+int previousValue3 = 0;
 int mappedPotValue1;
+int mappedPotValue3;
 
 
 int offsetLookup [5];
@@ -106,35 +108,54 @@ void loop() {
 
 
 
-  int  sensorValue = analogRead(A0);
-  int mappedPotValue1 = map(sensorValue, 0, 1023, 3, 18);
-  Serial.println("mapping - previous");
-  Serial.println(mappedPotValue1);
-  Serial.println(previousValue1);
+  int  sensorValue1 = analogRead(A0);
+  int mappedPotValue1 = map(sensorValue1, 0, 1023, 3, 18);
 
-  if ( mappedPotValue1 != previousValue1 &&  !echoInMovement[0]) {
+  int  sensorValue3 = analogRead(A1);
+  int mappedPotValue3 = map(sensorValue3, 0, 1023, 13, 3);
+  Serial.println("mapping - previous");
+  Serial.println(mappedPotValue3);
+  Serial.println(previousValue3);
+  //
+    if ( mappedPotValue1 != previousValue1 &&  !echoInMovement[0]) {
+      Serial.println("change in pot");
+      long echoPreviousMillisTracker[5];
+      echoInMovement[0] = true;
+      xAxisEchoOrigin[0] = 0;
+      previousValue1 = mappedPotValue1;
+  
+    }
+  
+    if ( echoInMovement[0]) {
+      Serial.println("starting movement");
+  
+      drawEchoMovement(0, mappedPotValue1, currentMillis);
+  
+    } else if (!echoCollisionTriggerLookup[0]){
+  
+      drawEchoAnimation(0, currentMillis);
+  
+    }
+
+
+  if ( mappedPotValue3 != previousValue3 &&  !echoInMovement[3]) {
     Serial.println("change in pot");
-    long echoPreviousMillisTracker[5];
-    echoInMovement[0] = true;
-    xAxisEchoOrigin[0] = 0;
-    previousValue1 = mappedPotValue1;
+    echoInMovement[3] = true;
+    yAxisEchoOrigin[3] = 14;
+    previousValue3 = mappedPotValue3;
 
   }
 
-  if ( echoInMovement[0]) {
+  if ( echoInMovement[3]) {
     Serial.println("starting movement");
 
-    drawEchoMovement(0, mappedPotValue1, currentMillis);
+    drawEchoMovement(3, mappedPotValue1, currentMillis);
 
-  } else {
+  } else if (!echoCollisionTriggerLookup[3]){
 
-    drawEchoAnimation(0, currentMillis);
-
-
-
+    drawEchoAnimation(3, currentMillis);
 
   }
-
 
 
   //  drawEchoAnimation(1, currentMillis);
@@ -142,11 +163,12 @@ void loop() {
   //  drawEchoAnimation(3, currentMillis);
   //  drawEchoAnimation(4, currentMillis);
 
-  //    delay(700);
+//  delay(700);
   Serial.println("starting compare loop");
 
   compareMinMax(0, 1);
   compareMinMax(2, 0);
+  compareMinMax(0, 3);
 
   compareMinMax(1, 3);
   FastLED.show();
@@ -167,16 +189,36 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
   if (currentMillis - previousMillis > 400) {
     clearPixels(echoIndex);
-
+    Serial.print("X ; ");
+    Serial.println(xAxisEchoOrigin[echoIndex]);
+    Serial.print("Y ; ");
+    Serial.println(yAxisEchoOrigin[echoIndex]);
     fillSquare(echoIndex, xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1);
-    xAxisEchoOrigin[echoIndex] += 1;
-    echoPreviousMillisTracker[echoIndex] = currentMillis;
-    if (xAxisEchoOrigin[echoIndex] >= mappedPotValue) {
-      echoInMovement[echoIndex] = false;
-      clearPixels(echoIndex);
+    if (echoDirectionLookup[echoIndex] == 'y') {
+      Serial.println("in here helllloooooo");
+
+      xAxisEchoOrigin[echoIndex] += 1;
+      if (xAxisEchoOrigin[echoIndex] >= mappedPotValue) {
+        echoInMovement[echoIndex] = false;
+        clearPixels(echoIndex);
+
+
+      }
+    } else {
+      Serial.println("nope i'm in here now");
+      yAxisEchoOrigin[echoIndex] -= 1;
+      if (yAxisEchoOrigin[echoIndex] <= mappedPotValue) {
+        echoInMovement[echoIndex] = false;
+        clearPixels(echoIndex);
+
+
+      }
 
 
     }
+
+    echoPreviousMillisTracker[echoIndex] = currentMillis;
+
   }
 }
 
@@ -211,6 +253,8 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 
 
     if (echo2xMin <= echo1xMax && echo2yMin <= echo1yMax) {
+      echoCollisionTriggerLookup[echo1Index] = true;
+      echoCollisionTriggerLookup[echo2Index] = true;
       for (int index = 0; index < 48; index++) {
         leds[pixelsInEcho[echo1Index][index]]  = CRGB::Gray ;
 
