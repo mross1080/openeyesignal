@@ -45,8 +45,13 @@ uint16_t XY( uint8_t x, uint8_t y)
 
 
 void setup() {
-  createEcho( 0, 6, 4, 'y');
-  createEcho( 1, 11, 4, 'x');
+  // 0 is coming from the y axis
+  createEcho( 0, 7, 4, 'y');
+  // 1 is coming from x axis and is closest to the left
+  createEcho( 1, 4, 8, 'x');
+  // 2 is coming from the x axis and is second to the left
+  createEcho( 2, 10, 4, 'x');
+
   //  createEcho( 2, 3, 10);
   //  Serial.println(echo->originX);
   // put your setup code here, to run once:
@@ -76,16 +81,14 @@ void loop() {
 
   drawEchoAnimation(0);
   drawEchoAnimation(1);
-  //  drawEchoAnimation(2);
+  drawEchoAnimation(2);
 
   //  delay(400);
   Serial.println("starting compare loop");
 
-  if (compareMinMax(0, 1)) {
-    Serial.println("!!!!!!!!!!!");
+  compareMinMax(0, 1);
+  compareMinMax(0, 2);
 
-
-  }
   //  for (int index = 0; index < 2; index++) {
   //    for (int compareIndex = 0; compareIndex < 2; compareIndex++) {
   //
@@ -121,6 +124,7 @@ void loop() {
 
 int offsetLookup [3];
 int echoCounters[3];
+bool echoCollisionTriggerLookup[3];
 int xAxisEchoOrigin[3];
 int xAxisEchoMinimum[3];
 int yAxisEchoOrigin[3];
@@ -146,11 +150,7 @@ bool compareMinMax(int echo1Index, int echo2Index) {
   int offset2 = offsetLookup[echo2Index];
 
 
-  if (echoDirectionLookup == 'y') {
-      // change the values of the lookup 
 
-
-  }
   // Retrieve the origin of both echos
 
 
@@ -168,8 +168,11 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 
     int echo1xMax = echo1x + offset1;
     int echo1yMax = echo1y + offset1;
+    int echo1xMin = echo1x - offset1;
+    int echo1Min = echo1y - offset1;
     int echo2xMin = echo2x - offset2;
     int echo2yMin = echo2y - offset2;
+
     //
     //
     //    Serial.print("X1 : ");
@@ -196,12 +199,27 @@ bool compareMinMax(int echo1Index, int echo2Index) {
     //    Serial.println(echo2yMin);
 
     if (echo2xMin <= echo1xMax && echo2yMin <= echo1yMax) {
+         for (int index = 0; index < 48; index++) {
+        leds[pixelsInEcho[echo1Index][index]]  = CRGB::FloralWhite;
+
+        leds[pixelsInEcho[echo2Index][index]]  = CRGB::FloralWhite;
+      }
       //            clearPixels(0);
       //            clearPixels(1);
       //.fadeToBlackBy( 64 )
       for (int y = 0; y < 4; y++) {
-        leds[XY(echo1xMax, echo1yMax - y)]  = CHSV( 80, 220, 220);
-        leds[XY(echo2xMin, echo2yMin + y)]  = CHSV( 80, 220, 220);
+
+        if (echo1xMin < echo2xMin && echo1xMin < echo2xMin) {
+
+          leds[XY(echo1xMax, echo1yMax - y)]  = CHSV( 80, 220, 220);
+          leds[XY(echo2xMin, echo2yMin + y)]  = CHSV( 80, 220, 220);
+
+        } else {
+
+          leds[XY(echo1xMax - y, echo1yMax)]  = CHSV( 80, 220, 220);
+          leds[XY(echo2xMin + y, echo2yMin)]  = CHSV( 80, 220, 220);
+
+        }
 
       }
       //
@@ -219,14 +237,17 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 
 
 
-      //      for (int x = 0; x < 48; x++) {
-      //        int current1Value = pixelsInEcho[3]
-      //        for (int y = 0; y < 48; y++) {
-      //          leds[XY(x, y)]  = CHSV( 0, 0, 0);
-      //        }
-      //
-      //
-      //      }
+
+
+
+
+      //              int current1Value = pixelsInEcho[3]
+
+
+   
+
+
+
 
       //     delay(10000);
 
@@ -334,7 +355,7 @@ void drawCircle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t r,
 void drawEchoAnimation(int echoLookupIndex) {
   int counter = echoCounters[echoLookupIndex];
 
-  if (counter <= 3 ) {
+  if (counter <= 2 ) {
     fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
     echoCounters[echoLookupIndex]++;
 
