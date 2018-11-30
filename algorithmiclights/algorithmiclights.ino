@@ -50,14 +50,14 @@ void setup() {
   // 1 is coming from the y axis and is closer to the bottom
   createEcho( 1, 3, 9, 'y');
 
-  
+
   // 2 is coming from x axis and is closest to the left
   createEcho( 2, 4, 3, 'x');
   // 3 is coming from the x axis and is in the middle
   createEcho( 3, 9, 8, 'x');
- 
-      // 4is coming from the x axis and is closest to the right 
-  createEcho( 4, 14, 17, 'x');
+
+  // 4is coming from the x axis and is closest to the right
+  createEcho( 4, 14, 10, 'x');
 
   //  createEcho( 2, 3, 10);
   //  Serial.println(echo->originX);
@@ -79,35 +79,8 @@ void setup() {
 
 //long previousMillis = 0;
 
-void loop() {
-  long timeDelta;
-  unsigned long currentMillis = millis();
-  //  Echo echoLookup[2];
-  // put your main code here, to run repeatedly:
-  FastLED.show();
-  // insert a delay to keep the framerate modest
-  FastLED.delay(1000 / FRAMES_PER_SECOND);
-
-
-  drawEchoAnimation(0,currentMillis);
-  drawEchoAnimation(1,currentMillis);
-  drawEchoAnimation(2,currentMillis);
-//  drawEchoAnimation(3,currentMillis);
-
-  //  delay(400);
-  Serial.println("starting compare loop");
-
-  compareMinMax(0, 1);
-  compareMinMax(2, 0);
-
-  compareMinMax(1,3);
-
-
-  FastLED.show();
-  //  echo->clearPixels();
-  //  echo2->clearPixels();
-
-}
+int previousValue1 = 0;
+int mappedPotValue1;
 
 
 int offsetLookup [5];
@@ -119,11 +92,93 @@ int yAxisEchoOrigin[5];
 int pixelsInEcho[5][49];
 char echoDirectionLookup[5];
 long echoPreviousMillisTracker[5];
+bool echoInMovement[5];
+void loop() {
+
+  leds[2]  = CHSV( 80, 220, 220);
+  long timeDelta;
+  unsigned long currentMillis = millis();
+  //  Echo echoLookup[2];
+  // put your main code here, to run repeatedly:
+  FastLED.show();
+  // insert a delay to keep the framerate modest
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
+
+
+
+  int  sensorValue = analogRead(A0);
+  int mappedPotValue1 = map(sensorValue, 0, 1023, 3, 18);
+  Serial.println("mapping - previous");
+  Serial.println(mappedPotValue1);
+  Serial.println(previousValue1);
+
+  if ( mappedPotValue1 != previousValue1 &&  !echoInMovement[0]) {
+    Serial.println("change in pot");
+    long echoPreviousMillisTracker[5];
+    echoInMovement[0] = true;
+    xAxisEchoOrigin[0] = 0;
+    previousValue1 = mappedPotValue1;
+
+  }
+
+  if ( echoInMovement[0]) {
+    Serial.println("starting movement");
+
+    drawEchoMovement(0, mappedPotValue1, currentMillis);
+
+  } else {
+
+    drawEchoAnimation(0, currentMillis);
+
+
+
+
+  }
+
+
+
+  //  drawEchoAnimation(1, currentMillis);
+  //  drawEchoAnimation(2, currentMillis);
+  //  drawEchoAnimation(3, currentMillis);
+  //  drawEchoAnimation(4, currentMillis);
+
+  //    delay(700);
+  Serial.println("starting compare loop");
+
+  compareMinMax(0, 1);
+  compareMinMax(2, 0);
+
+  compareMinMax(1, 3);
+  FastLED.show();
+
+
+}
+
+
 //int xAxisEchoMinimum[3];
 
 
 
+void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
+  long previousMillis = echoPreviousMillisTracker[echoIndex];
 
+
+
+
+  if (currentMillis - previousMillis > 400) {
+    clearPixels(echoIndex);
+
+    fillSquare(echoIndex, xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1);
+    xAxisEchoOrigin[echoIndex] += 1;
+    echoPreviousMillisTracker[echoIndex] = currentMillis;
+    if (xAxisEchoOrigin[echoIndex] >= mappedPotValue) {
+      echoInMovement[echoIndex] = false;
+      clearPixels(echoIndex);
+
+
+    }
+  }
+}
 
 
 
@@ -154,33 +209,9 @@ bool compareMinMax(int echo1Index, int echo2Index) {
     int echo2xMin = echo2x - offset2;
     int echo2yMin = echo2y - offset2;
 
-    //
-    //
-    //    Serial.print("X1 : ");
-    //    Serial.println(echo1x);
-    //    Serial.print("Y1 : ");
-    //    Serial.println(echo1y);
-    //    Serial.print("X2: ");
-    //    Serial.println(echo2x);
-    //    Serial.print("Y2 : ");
-    //    Serial.println(echo2y);
-    //    //
-    //    Serial.print("E1 offset : ");
-    //    Serial.println(offset1);
-    //    Serial.print("E2 offset : ");
-    //    Serial.println(offset2);
-    //
-    //    Serial.print("X1 max : ");
-    //    Serial.println(echo1xMax);
-    //    Serial.print("Y1 max : ");
-    //    Serial.println(echo1yMax);
-    //    Serial.print("X2 min : ");
-    //    Serial.println(echo2xMin);
-    //    Serial.print("Y2 min : ");
-    //    Serial.println(echo2yMin);
 
     if (echo2xMin <= echo1xMax && echo2yMin <= echo1yMax) {
-         for (int index = 0; index < 48; index++) {
+      for (int index = 0; index < 48; index++) {
         leds[pixelsInEcho[echo1Index][index]]  = CRGB::Gray ;
 
         leds[pixelsInEcho[echo2Index][index]]  = CRGB::Gray ;
@@ -225,19 +256,30 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
   int counter = echoCounters[echoLookupIndex];
   long previousMillis = echoPreviousMillisTracker[echoLookupIndex];
-if (currentMillis - previousMillis > 600) {
-  if (counter <= 2 ) {
-    fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
-    echoCounters[echoLookupIndex]++;
+  if (currentMillis - previousMillis > 600) {
+    if (counter <= 2 ) {
+      fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
+      FastLED.show();
+      echoCounters[echoLookupIndex]++;
 
-  } else if (counter == 49) {
-    randomizeEcho(echoLookupIndex);
-  } else {
-      clearPixels(echoLookupIndex);
+    } else if (counter == 49) {
+      randomizeEcho(echoLookupIndex);
+    }
 
   }
-  echoPreviousMillisTracker[echoLookupIndex] = currentMillis;
-}
+
+  if (currentMillis - previousMillis > 2000) {
+
+    if (counter > 2) {
+      clearPixels(echoLookupIndex);
+      echoPreviousMillisTracker[echoLookupIndex] = currentMillis;
+    }
+  }
+
+
+
+
+
 
 }
 
@@ -272,8 +314,6 @@ void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int lev
 
     offset = 7;
   }
-  Serial.print("offset : ");
-  Serial.println(offset);
 
   for (int x = 0; x < offset; x++) {
     int xindex = xCoordinate - level + x;
@@ -288,10 +328,8 @@ void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int lev
 
 
       } else {
-        Serial.println("Skipping");
       }
       pixelsInEcho[echoLookupIndex][arrayCounter] = ledLocation;
-      Serial.println(arrayCounter);
       arrayCounter++;
 
     }
@@ -309,6 +347,7 @@ void createEcho(int index, int x, int y, char c) {
   offsetLookup[index] = 0;
   echoDirectionLookup[index] = c;
   echoPreviousMillisTracker[index] = 0;
+  echoInMovement[index] = false;
 
 }
 
