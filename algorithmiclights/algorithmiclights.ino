@@ -45,12 +45,19 @@ uint16_t XY( uint8_t x, uint8_t y)
 
 
 void setup() {
-  // 0 is coming from the y axis
-  createEcho( 0, 7, 4, 'y');
-  // 1 is coming from x axis and is closest to the left
-  createEcho( 1, 4, 8, 'x');
-  // 2 is coming from the x axis and is second to the left
-  createEcho( 2, 10, 4, 'x');
+  // 0 is coming from the y axis top
+  createEcho( 0, 16, 4, 'y');
+  // 1 is coming from the y axis and is closer to the bottom
+  createEcho( 1, 3, 9, 'y');
+
+  
+  // 2 is coming from x axis and is closest to the left
+  createEcho( 2, 4, 3, 'x');
+  // 3 is coming from the x axis and is in the middle
+  createEcho( 3, 9, 8, 'x');
+ 
+      // 4is coming from the x axis and is closest to the right 
+  createEcho( 4, 14, 17, 'x');
 
   //  createEcho( 2, 3, 10);
   //  Serial.println(echo->originX);
@@ -70,7 +77,10 @@ void setup() {
 
 }
 
+//long previousMillis = 0;
+
 void loop() {
+  long timeDelta;
   unsigned long currentMillis = millis();
   //  Echo echoLookup[2];
   // put your main code here, to run repeatedly:
@@ -79,41 +89,19 @@ void loop() {
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 
 
-  drawEchoAnimation(0);
-  drawEchoAnimation(1);
-  drawEchoAnimation(2);
+  drawEchoAnimation(0,currentMillis);
+  drawEchoAnimation(1,currentMillis);
+  drawEchoAnimation(2,currentMillis);
+//  drawEchoAnimation(3,currentMillis);
 
   //  delay(400);
   Serial.println("starting compare loop");
 
   compareMinMax(0, 1);
-  compareMinMax(0, 2);
+  compareMinMax(2, 0);
 
-  //  for (int index = 0; index < 2; index++) {
-  //    for (int compareIndex = 0; compareIndex < 2; compareIndex++) {
-  //
-  //      if (index != compareIndex) {
-  //        Serial.println("comparing again");
-  //        if (compareMinMax(index, compareIndex)) {
-  //
-  //          //                    if (echoLookup[index].compareMinMax(echoLookup[compareIndex].minimumX, echoLookup[compareIndex].minimumY, echoLookup[compareIndex].offset)) {
-  //          Serial.println("!!!!!!!!!!!");
-  //          //          for (int x = 0; x < kMatrixWidth; x++) {
-  //          //            for (int y = 0; y < kMatrixHeight; y++) {
-  //          //              leds[XY(x, y)]  = CHSV( 220, 220, 220);
-  //          //            }
-  //          //
-  //          //
-  //          //
-  //          //          }
-  //
-  //
-  //        }
-  //
-  //
-  //      }
-  //    }
-  //  }
+  compareMinMax(1,3);
+
 
   FastLED.show();
   //  echo->clearPixels();
@@ -122,14 +110,15 @@ void loop() {
 }
 
 
-int offsetLookup [3];
-int echoCounters[3];
-bool echoCollisionTriggerLookup[3];
-int xAxisEchoOrigin[3];
-int xAxisEchoMinimum[3];
-int yAxisEchoOrigin[3];
-int pixelsInEcho[3][49];
-char echoDirectionLookup[3];
+int offsetLookup [5];
+int echoCounters[5];
+bool echoCollisionTriggerLookup[5];
+int xAxisEchoOrigin[5];
+int xAxisEchoMinimum[5];
+int yAxisEchoOrigin[5];
+int pixelsInEcho[5][49];
+char echoDirectionLookup[5];
+long echoPreviousMillisTracker[5];
 //int xAxisEchoMinimum[3];
 
 
@@ -155,14 +144,6 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 
 
   if ( offset1 > 1 && offset2 > 1) {
-
-
-
-
-
-
-
-
     int offset1 = offsetLookup[echo1Index];
     int offset2 = offsetLookup[echo2Index];
 
@@ -200,9 +181,9 @@ bool compareMinMax(int echo1Index, int echo2Index) {
 
     if (echo2xMin <= echo1xMax && echo2yMin <= echo1yMax) {
          for (int index = 0; index < 48; index++) {
-        leds[pixelsInEcho[echo1Index][index]]  = CRGB::FloralWhite;
+        leds[pixelsInEcho[echo1Index][index]]  = CRGB::Gray ;
 
-        leds[pixelsInEcho[echo2Index][index]]  = CRGB::FloralWhite;
+        leds[pixelsInEcho[echo2Index][index]]  = CRGB::Gray ;
       }
       //            clearPixels(0);
       //            clearPixels(1);
@@ -229,29 +210,6 @@ bool compareMinMax(int echo1Index, int echo2Index) {
       //        createEcho( 1, echo2xMin - 1, echo2yMin);
       //      echoCounters[0] = 4;
       //      echoCounters[1] = 4;
-
-
-      //DONT DO THIS FOREVER FIX THIS
-
-      //      int pixelsInEcho[3][49];
-
-
-
-
-
-
-
-      //              int current1Value = pixelsInEcho[3]
-
-
-   
-
-
-
-
-      //     delay(10000);
-
-
       return true;
     }
   }
@@ -259,6 +217,119 @@ bool compareMinMax(int echo1Index, int echo2Index) {
   return false;
 
 }
+
+
+
+
+
+void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
+  int counter = echoCounters[echoLookupIndex];
+  long previousMillis = echoPreviousMillisTracker[echoLookupIndex];
+if (currentMillis - previousMillis > 600) {
+  if (counter <= 2 ) {
+    fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
+    echoCounters[echoLookupIndex]++;
+
+  } else if (counter == 49) {
+    randomizeEcho(echoLookupIndex);
+  } else {
+      clearPixels(echoLookupIndex);
+
+  }
+  echoPreviousMillisTracker[echoLookupIndex] = currentMillis;
+}
+
+}
+
+bool pixelHasValue(int pixel) {
+
+  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
+
+}
+int offset = 0;
+
+
+void randomizeEcho(int echoLookupIndex) {
+
+  leds[pixelsInEcho[echoLookupIndex][random(0, 48)]] = CHSV( random(0, 255), 200, 255);
+  FastLED.show();
+
+
+}
+
+void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int level) {
+  int pixelHue = random(0, 255);
+  int arrayCounter = 0;
+  offsetLookup[echoLookupIndex] = level;
+  if (level == 1) {
+
+    offset = 3;
+
+  } else if (level == 2) {
+    offset = 5;
+
+  } else if (level == 3) {
+
+    offset = 7;
+  }
+  Serial.print("offset : ");
+  Serial.println(offset);
+
+  for (int x = 0; x < offset; x++) {
+    int xindex = xCoordinate - level + x;
+    for (int i = 0; i < offset; i++) {
+      int yindex = yCoordinate - level + i;
+      int ledLocation = XY(xindex, yindex);
+
+
+      if (!pixelHasValue(ledLocation)) {
+
+        leds[ledLocation]  = CHSV(pixelHue, 200, 200);
+
+
+      } else {
+        Serial.println("Skipping");
+      }
+      pixelsInEcho[echoLookupIndex][arrayCounter] = ledLocation;
+      Serial.println(arrayCounter);
+      arrayCounter++;
+
+    }
+  }
+
+}
+
+
+
+
+void createEcho(int index, int x, int y, char c) {
+  xAxisEchoOrigin[index] = x;
+  yAxisEchoOrigin[index] = y;
+  echoCounters[index] = 1;
+  offsetLookup[index] = 0;
+  echoDirectionLookup[index] = c;
+  echoPreviousMillisTracker[index] = 0;
+
+}
+
+
+void clearPixels(int echoLookupIndex) {
+  //  echoCounters[index] = 1;
+  //
+  echoCounters[echoLookupIndex] = 1;
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      leds[XY(x, y)]  = CHSV( 0, 0, 0);
+    }
+    //  sizeof(array)/sizeof(array[0]
+    //  for (int x = 0; x < 48; x++) {
+    //    leds[pixelsInEcho[echoLookupIndex][x]]  = CHSV( 0, 0, 0);
+
+
+  }
+}
+
+
 
 void writePixel(int x, int y, int pixelHue) {
 
@@ -347,111 +418,4 @@ void drawCircle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t r,
 
 }
 
-
-
-
-
-
-void drawEchoAnimation(int echoLookupIndex) {
-  int counter = echoCounters[echoLookupIndex];
-
-  if (counter <= 2 ) {
-    fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
-    echoCounters[echoLookupIndex]++;
-
-  } else if (counter == 49) {
-    randomizeEcho(echoLookupIndex);
-  } else {
-
-
-  }
-
-}
-
-bool pixelHasValue(int pixel) {
-
-  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
-
-}
-int offset = 0;
-
-
-void randomizeEcho(int echoLookupIndex) {
-
-  leds[pixelsInEcho[echoLookupIndex][random(0, 48)]] = CHSV( random(0, 255), 200, 255);
-  FastLED.show();
-
-
-}
-
-void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int level) {
-  int pixelHue = random(0, 255);
-  int arrayCounter = 0;
-  offsetLookup[echoLookupIndex] = level;
-  if (level == 1) {
-
-    offset = 3;
-
-  } else if (level == 2) {
-    offset = 5;
-
-  } else if (level == 3) {
-
-    offset = 7;
-  }
-  Serial.print("offset : ");
-  Serial.println(offset);
-
-  for (int x = 0; x < offset; x++) {
-    int xindex = xCoordinate - level + x;
-    for (int i = 0; i < offset; i++) {
-      int yindex = yCoordinate - level + i;
-      int ledLocation = XY(xindex, yindex);
-
-
-      if (!pixelHasValue(ledLocation)) {
-
-        leds[ledLocation]  = CHSV(pixelHue, 200, 200);
-
-
-      } else {
-        Serial.println("Skipping");
-      }
-      pixelsInEcho[echoLookupIndex][arrayCounter] = ledLocation;
-      Serial.println(arrayCounter);
-      arrayCounter++;
-
-    }
-  }
-
-}
-
-
-
-
-void createEcho(int index, int x, int y, char c) {
-  xAxisEchoOrigin[index] = x;
-  yAxisEchoOrigin[index] = y;
-  echoCounters[index] = 1;
-  offsetLookup[index] = 0;
-  echoDirectionLookup[index] = c;
-
-}
-
-
-void clearPixels(int echoLookupIndex) {
-  //  echoCounters[index] = 1;
-  //
-  echoCounters[echoLookupIndex] = 1;
-  for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)]  = CHSV( 0, 0, 0);
-    }
-    //  sizeof(array)/sizeof(array[0]
-    //  for (int x = 0; x < 48; x++) {
-    //    leds[pixelsInEcho[echoLookupIndex][x]]  = CHSV( 0, 0, 0);
-
-
-  }
-}
 
