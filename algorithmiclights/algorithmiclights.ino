@@ -46,7 +46,7 @@ uint16_t XY( uint8_t x, uint8_t y)
 
 void setup() {
   // 0 is coming from the y axis top
-  createEcho( 0, 16, 4, 'y');
+  createEcho( 0, 4, 4, 'y');
   // 1 is coming from the y axis and is closer to the bottom
   createEcho( 1, 3, 9, 'y');
 
@@ -131,7 +131,7 @@ void loop() {
 
     previousMillis11 = currentMillis;
 
-    if ( abs(mappedPotValue0 - previousValue0) > 3 &&  !echoInMovement[0]) {
+    if ( abs(mappedPotValue0 - previousValue0) > 5 &&  !echoInMovement[0]) {
       echoInMovement[0] = true;
       xAxisEchoOrigin[0] = 0;
       previousValue0 = mappedPotValue0;
@@ -162,6 +162,10 @@ void loop() {
         clearPixels(4);
 
       }
+      if (echoCounters[0] == 10) {
+        clearPixels(0);
+
+      }
 
     }
 
@@ -182,6 +186,10 @@ void loop() {
       yAxisEchoOrigin[4] = 14;
 
       previousValue3 = mappedPotValue3;
+      if (echoCounters[0] == 10) {
+        clearPixels(0);
+
+      }
 
     }
 
@@ -288,11 +296,11 @@ bool compareMinMax(int echo1Index, int echo2Index) {
   if ( offset1 > 1 && offset2 > 1) {
     int offset1 = offsetLookup[echo1Index];
     int offset2 = offsetLookup[echo2Index];
-//    Serial.println("!-----");
-//    Serial.println(offset1);
-//    Serial.println(echo1x);
-//    Serial.println(echo1y);
-//    Serial.println("-----!");
+    //    Serial.println("!-----");
+    //    Serial.println(offset1);
+    //    Serial.println(echo1x);
+    //    Serial.println(echo1y);
+    //    Serial.println("-----!");
 
     int echo1xMax = echo1x + offset1;
     int echo1yMax = echo1y + offset1;
@@ -300,14 +308,14 @@ bool compareMinMax(int echo1Index, int echo2Index) {
     int echo1Min = echo1y - offset1;
     int echo2xMin = echo2x - offset2;
     int echo2yMin = echo2y - offset2;
-//
-//    Serial.println("-----");
-//    Serial.println(echo2xMin);
-//    Serial.println(echo2yMin);
-//    Serial.println("-");
-//    Serial.println(echo1xMax);
-//    Serial.println(echo1yMax);
-//    Serial.println("-------");
+    //
+    //    Serial.println("-----");
+    //    Serial.println(echo2xMin);
+    //    Serial.println(echo2yMin);
+    //    Serial.println("-");
+    //    Serial.println(echo1xMax);
+    //    Serial.println(echo1yMax);
+    //    Serial.println("-------");
     /// Fix collisions for 0 and 4
     if (echo2xMin <= echo1xMax && echo2yMin <= echo1yMax && !echoInMovement[echo2Index]) {
 
