@@ -47,27 +47,27 @@ uint16_t XY( uint8_t x, uint8_t y)
 void setup() {
   // 0 is coming from the y axis top
   createEcho( 0, 4, 4, 'y');
-  // 1 is coming from the y axis and is closer to the bottom
-  createEcho( 1, 3, 9, 'y');
-
-
-  // 2 is coming from x axis and is closest to the left
-  createEcho( 2, 4, 3, 'x');
-  // 3 is coming from the x axis and is in the middle
-  createEcho( 3, 9, 10, 'x');
-
-  // 4is coming from the x axis and is closest to the right
-  createEcho( 4, 14, 10, 'x');
+  //  // 1 is coming from the y axis and is closer to the bottom
+  //  createEcho( 1, 3, 9, 'y');
+  //
+  //
+  //  // 2 is coming from x axis and is closest to the left
+  //  createEcho( 2, 4, 3, 'x');
+  //  // 3 is coming from the x axis and is in the middle
+  //  createEcho( 3, 9, 10, 'x');
+  //
+  //  // 4is coming from the x axis and is closest to the right
+  //  createEcho( 4, 14, 10, 'x');
 
   //  createEcho( 2, 3, 10);
   //  Serial.println(echo->originX);
   // put your setup code here, to run once:
   int pixelHue = 200;
-  // put your setup code here, to run once:
+  //  // put your setup code here, to run once:
   Serial.begin(9600);
-  delay(3000); // 3 second delay for recovery
-
-  // tell FastLED about the LED strip configuration
+  //  delay(3000); // 3 second delay for recovery
+  //
+  //  // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   //FastLED.addLeds<LED_TYPE,DATA_PIN,CLK_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 
@@ -77,7 +77,7 @@ void setup() {
 
 }
 
-//long previousMillis = 0;
+long previousMillis = 0;
 
 int previousValue0 = 0;
 int previousValue1 = 0;
@@ -98,129 +98,131 @@ char echoDirectionLookup[5];
 long echoPreviousMillisTracker[5];
 bool echoInMovement[5];
 long previousMillis11 = 0;
-
+int sensorValue0;
+int mappedPotValue0;
 void loop() {
-
+  delay(100);
   leds[2]  = CHSV( 80, 220, 220);
   long timeDelta;
   unsigned long currentMillis = millis();
-  //  Echo echoLookup[2];
-  // put your main code here, to run repeatedly:
+  //  //  Echo echoLookup[2];
+  //  // put your main code here, to run repeatedly:
   FastLED.show();
   // insert a delay to keep the framerate modest
   FastLED.delay(1000 / FRAMES_PER_SECOND);
+  //
+  //
+  //
+   pixelHasValue(10);
+  sensorValue0 = analogRead(A0);
+  mappedPotValue0 = map(sensorValue0, 0, 1023, 3, 16);
+  //  //  int mappedPotValue1 = 14;
+  //
+  //  int  sensorValue1 = analogRead(A3);
+  //  int mappedPotValue1 = map(sensorValue1, 0, 1023, 3, 16);
+  //
+  //  int  sensorValue3 = analogRead(A1);
+  //  int mappedPotValue3 = map(sensorValue3, 0, 1023, 11, 3);
+  //  //  int mappedPotValue3 = 9;
 
-
-
-  int  sensorValue0 = analogRead(A0);
-  int mappedPotValue0 = map(sensorValue0, 0, 1023, 3, 16);
-  //  int mappedPotValue1 = 14;
-
-  int  sensorValue1 = analogRead(A3);
-  int mappedPotValue1 = map(sensorValue1, 0, 1023, 3, 16);
-
-  int  sensorValue3 = analogRead(A1);
-  int mappedPotValue3 = map(sensorValue3, 0, 1023, 11, 3);
-  //  int mappedPotValue3 = 9;
-
-  //    Serial.println("mapping - previous");
-  //    Serial.println(mappedPotValue1);
-  //    Serial.println(previousValue1);
-  if (currentMillis - previousMillis11 > 0) {
-    counters[0] = 10;
-
-    previousMillis11 = currentMillis;
-
-    if ( abs(mappedPotValue0 - previousValue0) > 5 &&  !echoInMovement[0]) {
-      echoInMovement[0] = true;
-      xAxisEchoOrigin[0] = 0;
-      previousValue0 = mappedPotValue0;
-      if (echoCounters[4] == 10) {
-        clearPixels(4);
-
-      }
-
-    }
-
-    if ( echoInMovement[0]) {
-      //    Serial.println("starting movement");
-      clearPixels(0);
-
-      drawEchoMovement(0, mappedPotValue0, currentMillis);
-
-    } else if (!echoCollisionTriggerLookup[0]) {
-
-      drawEchoAnimation(0, currentMillis);
-
-    }
-
-    if ( abs(mappedPotValue1 - previousValue1) > 3 &&  !echoInMovement[1]) {
-      echoInMovement[1] = true;
-      xAxisEchoOrigin[1] = 0;
-      previousValue1 = mappedPotValue1;
-      if (echoCounters[4] == 10) {
-        clearPixels(4);
-
-      }
-      if (echoCounters[0] == 10) {
-        clearPixels(0);
-
-      }
-
-    }
-
-    if ( echoInMovement[1]) {
-      clearPixels(1);
-
-      drawEchoMovement(1, mappedPotValue1, currentMillis);
-
-    } else if (!echoCollisionTriggerLookup[1]) {
-
-      drawEchoAnimation(1, currentMillis);
-
-    }
-
-    if ( abs(mappedPotValue3 - previousValue3) > 3 &&  !echoInMovement[4]) {
-      Serial.println("change in pot");
-      echoInMovement[4] = true;
-      yAxisEchoOrigin[4] = 14;
-
-      previousValue3 = mappedPotValue3;
-      if (echoCounters[0] == 10) {
-        clearPixels(0);
-
-      }
-
-    }
-
-    if ( echoInMovement[4]) {
-      clearPixels(4);
-      Serial.println("starting movement");
-
-      drawEchoMovement(4, mappedPotValue3, currentMillis);
-      Serial.println("out of movement");
-
-    } else if (!echoCollisionTriggerLookup[4]) {
-
-      if (compareMinMax(1, 4)) {
-        echoCounters[1] = 10;
-        echoCounters[4] = 10;
-
-      }
-
-      if (compareMinMax(0 , 4)) {
-        echoCounters[0] = 10;
-        echoCounters[4] = 10;
-
-      }
-      //    compareMinMax(0, 4);
-      drawEchoAnimation(4, currentMillis);
-
-    }
-
-  }
-
-  FastLED.show();
+  Serial.println("mapping - previous");
+  Serial.println(mappedPotValue0);
+  Serial.println(previousValue0);
+  //  if (currentMillis - previousMillis11 > 0) {
+  //    counters[0] = 10;
+  //
+  //    previousMillis11 = currentMillis;
+  //
+  //    if ( abs(mappedPotValue0 - previousValue0) > 5 &&  !echoInMovement[0]) {
+  //      echoInMovement[0] = true;
+  //      xAxisEchoOrigin[0] = 0;
+  //      previousValue0 = mappedPotValue0;
+  //      if (echoCounters[4] == 10) {
+  //        clearPixels(4);
+  //
+  //      }
+  //
+  //    }
+  //
+  //    if ( echoInMovement[0]) {
+  //      //    Serial.println("starting movement");
+  //      clearPixels(0);
+  //
+  //      drawEchoMovement(0, mappedPotValue0, currentMillis);
+  //
+  //    } else if (!echoCollisionTriggerLookup[0]) {
+  //
+  //      drawEchoAnimation(0, currentMillis);
+  //
+  //    }
+  //
+  //    if ( abs(mappedPotValue1 - previousValue1) > 3 &&  !echoInMovement[1]) {
+  //      echoInMovement[1] = true;
+  //      xAxisEchoOrigin[1] = 0;
+  //      previousValue1 = mappedPotValue1;
+  //      if (echoCounters[4] == 10) {
+  //        clearPixels(4);
+  //
+  //      }
+  //      if (echoCounters[0] == 10) {
+  //        clearPixels(0);
+  //
+  //      }
+  //
+  //    }
+  //
+  //    if ( echoInMovement[1]) {
+  //      clearPixels(1);
+  //
+  //      drawEchoMovement(1, mappedPotValue1, currentMillis);
+  //
+  //    } else if (!echoCollisionTriggerLookup[1]) {
+  //
+  //      drawEchoAnimation(1, currentMillis);
+  //
+  //    }
+  //
+  //    if ( abs(mappedPotValue3 - previousValue3) > 3 &&  !echoInMovement[4]) {
+  //      Serial.println("change in pot");
+  //      echoInMovement[4] = true;
+  //      yAxisEchoOrigin[4] = 14;
+  //
+  //      previousValue3 = mappedPotValue3;
+  //      if (echoCounters[0] == 10) {
+  //        clearPixels(0);
+  //
+  //      }
+  //
+  //    }
+  //
+  //    if ( echoInMovement[4]) {
+  //      clearPixels(4);
+  //      Serial.println("starting movement");
+  //
+  //      drawEchoMovement(4, mappedPotValue3, currentMillis);
+  //      Serial.println("out of movement");
+  //
+  //    } else if (!echoCollisionTriggerLookup[4]) {
+  //
+  //      if (compareMinMax(1, 4)) {
+  //        echoCounters[1] = 10;
+  //        echoCounters[4] = 10;
+  //
+  //      }
+  //
+  //      if (compareMinMax(0 , 4)) {
+  //        echoCounters[0] = 10;
+  //        echoCounters[4] = 10;
+  //
+  //      }
+  //      //    compareMinMax(0, 4);
+  //      drawEchoAnimation(4, currentMillis);
+  //
+  //    }
+  //
+  //  }
+  //
+  //  FastLED.show();
 
 
 }
@@ -389,8 +391,10 @@ void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
 
 bool pixelHasValue(int pixel) {
 
-  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
+  //  return  leds[pixel].red != 0 ||  leds[pixel].blue != 0 ||  leds[pixel].green != 0;
+  leds[10]  = CHSV( random(0, 200), 220, 220);
 
+  return true;
 }
 int offset = 0;
 

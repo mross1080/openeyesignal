@@ -182,46 +182,13 @@ void loop() {
 
     }
     Serial.println("Checking for pot values");
-
+    runDrawSequence(1, mappedPotValue1, currentMillis);
     runDrawSequence(4, mappedPotValue4, currentMillis);
 
-    
-//    if ( abs(mappedPotValue4 - previousValue4) > 3 &&  !echoInMovement[4]) {
-//      echoInMovement[4] = true;
-//      yAxisEchoOrigin[4] = 17;
-//      previousValue4 = mappedPotValue4;
-//      if (echoCounters[1] == 10) {
-//        clearPixels(4);
-//
-//      }
-//      if (echoCounters[0] == 10) {
-//        clearPixels(0);
-//
-//      }
-//      //
-//    }
-//
-//    if ( echoInMovement[4]) {
-//      clearPixels(4);
-//      drawEchoMovement(4, mappedPotValue4, currentMillis);
-//
-//    } else if (!echoCollisionTriggerLookup[4]) {
-//      if (compareMinMax(1, 4)) {
-//        echoCounters[1] = 10;
-//        echoCounters[4] = 10;
-//
-//      }
-//
-//      if (compareMinMax(0 , 4)) {
-//        echoCounters[0] = 10;
-//        echoCounters[4] = 10;
-//
-//      }
-//      drawEchoAnimation(4, currentMillis);
-//
-//    }
+
+
   }
-  leds[8] = CHSV( random(0, 100), 220, 220);
+  leds[random(4, 7)] = CHSV( random(0, 100), 220, 220);
   FastLED.show();
 
 
@@ -245,6 +212,11 @@ void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) 
     } else {
       // set counters on the left side back to 0
       xAxisEchoOrigin[echoIndex] = 0;
+      for (int index = 2; index < 5; index++) {
+        if (echoCounters[index] == 10) {
+          clearPixels(index);
+        }
+      }
     }
     echoPreviousPotValueTracker[echoIndex] = potentiometerValue;
   }
@@ -257,12 +229,15 @@ void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) 
   } else if (!echoCollisionTriggerLookup[echoIndex]) {
 
     // before drawing square cycles check for collision
-    for (int index = 0; index < 2; index++) {
-      if (compareMinMax(index, echoIndex)) {
-        echoCounters[index] = 10;
-        echoCounters[echoIndex] = 10;
-      }
+    if (echoDirectionLookup[echoIndex] == 'x') {
 
+      for (int index = 0; index < 2; index++) {
+        if (compareMinMax(index, echoIndex)) {
+          echoCounters[index] = 10;
+          echoCounters[echoIndex] = 10;
+        }
+
+      }
     }
 
     drawEchoAnimation(echoIndex, currentMillis);
@@ -413,7 +388,7 @@ void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
   if (currentMillis - previousMillis > 600) {
     if (counter <= 2 ) {
       fillSquare(echoLookupIndex, xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], counter);
-      FastLED.show();
+//      FastLED.show();
       echoCounters[echoLookupIndex]++;
 
     } else if (counter == 49) {
