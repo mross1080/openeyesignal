@@ -41,9 +41,6 @@ uint16_t XY( uint8_t x, uint8_t y)
   return i;
 }
 
-
-
-
 void setup() {
   // 0 is coming from the y axis top
   Serial.begin(9600);
@@ -98,6 +95,7 @@ int yAxisEchoOrigin[5];
 int pixelsInEcho[5][49];
 char echoDirectionLookup[5];
 long echoPreviousMillisTracker[5];
+int echoPreviousPotValueTracker[5];
 bool echoInMovement[5];
 long previousMillis11 = 0;
 
@@ -176,35 +174,52 @@ void loop() {
       drawEchoMovement(1, mappedPotValue1, currentMillis);
 
     } else if (!echoCollisionTriggerLookup[1]) {
+      if (echoCounters[0] == 10) {
+        clearPixels(0);
 
+      }
       drawEchoAnimation(1, currentMillis);
 
     }
     Serial.println("Checking for pot values");
-    if ( abs(mappedPotValue4 - previousValue4) > 3 &&  !echoInMovement[4]) {
-      echoInMovement[4] = true;
-      yAxisEchoOrigin[4] = 17;
-      previousValue4 = mappedPotValue4;
-      ////      if (echoCounters[1] == 10) {
-      ////        clearPixels(4);
-      ////
-      ////      }
-      ////      if (echoCounters[0] == 10) {
-      ////        clearPixels(0);
-      ////
-      ////      }
-      //
-    }
 
-    if ( echoInMovement[4]) {
-      clearPixels(4);
-      drawEchoMovement(4, mappedPotValue4, currentMillis);
+    runDrawSequence(4, mappedPotValue4, currentMillis);
 
-    } else if (!echoCollisionTriggerLookup[4]) {
-
-      drawEchoAnimation(4, currentMillis);
-
-    }
+    
+//    if ( abs(mappedPotValue4 - previousValue4) > 3 &&  !echoInMovement[4]) {
+//      echoInMovement[4] = true;
+//      yAxisEchoOrigin[4] = 17;
+//      previousValue4 = mappedPotValue4;
+//      if (echoCounters[1] == 10) {
+//        clearPixels(4);
+//
+//      }
+//      if (echoCounters[0] == 10) {
+//        clearPixels(0);
+//
+//      }
+//      //
+//    }
+//
+//    if ( echoInMovement[4]) {
+//      clearPixels(4);
+//      drawEchoMovement(4, mappedPotValue4, currentMillis);
+//
+//    } else if (!echoCollisionTriggerLookup[4]) {
+//      if (compareMinMax(1, 4)) {
+//        echoCounters[1] = 10;
+//        echoCounters[4] = 10;
+//
+//      }
+//
+//      if (compareMinMax(0 , 4)) {
+//        echoCounters[0] = 10;
+//        echoCounters[4] = 10;
+//
+//      }
+//      drawEchoAnimation(4, currentMillis);
+//
+//    }
   }
   leds[8] = CHSV( random(0, 100), 220, 220);
   FastLED.show();
@@ -213,13 +228,56 @@ void loop() {
 }
 
 
+void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) {
+  if ( abs(potentiometerValue - echoPreviousPotValueTracker[echoIndex]) > 3 &&  !echoInMovement[echoIndex]) {
+    echoInMovement[echoIndex] = true;
+    if (echoDirectionLookup[echoIndex] == 'x') {
+      // start y axis from bottom of the board
+      yAxisEchoOrigin[echoIndex] = 17;
+
+      // Reset all counters that are frozen in a collision
+      for (int index = 0; index < 2; index++) {
+        if (echoCounters[index] == 10) {
+          clearPixels(index);
+        }
+      }
+
+    } else {
+      // set counters on the left side back to 0
+      xAxisEchoOrigin[echoIndex] = 0;
+    }
+    echoPreviousPotValueTracker[echoIndex] = potentiometerValue;
+  }
+
+  // If we're in movement cycle clear the trail and draw the next phas
+  if ( echoInMovement[echoIndex]) {
+    clearPixels(echoIndex);
+    drawEchoMovement(echoIndex, potentiometerValue, currentMillis);
+
+  } else if (!echoCollisionTriggerLookup[echoIndex]) {
+
+    // before drawing square cycles check for collision
+    for (int index = 0; index < 2; index++) {
+      if (compareMinMax(index, echoIndex)) {
+        echoCounters[index] = 10;
+        echoCounters[echoIndex] = 10;
+      }
+
+    }
+
+    drawEchoAnimation(echoIndex, currentMillis);
+
+  }
+}
+
+
+
 //int xAxisEchoMinimum[3];
 
 
 
 void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
   long previousMillis = echoPreviousMillisTracker[echoIndex];
-  //  delay(1000);
   //  Serial.print("prev mill ; ");
   //  Serial.println(previousMillis);
   //  Serial.print("currentMillis  ; ");
@@ -466,6 +524,7 @@ void createEcho(int index, int x, int y, char c) {
   echoDirectionLookup[index] = c;
   echoPreviousMillisTracker[index] = 0;
   echoInMovement[index] = false;
+  echoPreviousPotValueTracker[index] = 0;
 
 }
 
