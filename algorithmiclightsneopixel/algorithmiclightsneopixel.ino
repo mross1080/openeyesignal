@@ -16,14 +16,14 @@
 //#define CLK_PIN   4
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
-#define NUM_LEDS    280
+#define NUM_LEDS    700
 //CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
 
-const uint8_t kMatrixWidth = 20;
+const uint8_t kMatrixWidth = 50;
 const uint8_t kMatrixHeight = 14;
 const bool    kMatrixSerpentineLayout = true;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(260, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(700, PIN, NEO_GRB + NEO_KHZ800);
 
 uint16_t XY( uint8_t x, uint8_t y)
 {
@@ -102,21 +102,29 @@ int echoPreviousPotValueTracker[5];
 bool echoInMovement[5];
 long previousMillis11 = 0;
 long previousMillis = 0;
-
+bool stageTwo  = true;
+bool stageOne  = true;
+bool stageThree  = true;
 
 void loop() {
+   while (usbMIDI.read()) {
+    // ignore incoming messages
+  }
 
   //  delay(1000);
   //  leds[2]  = CHSV( 80, 220, 220);
   strip.setPixelColor(2, strip.Color(random(0, 150), 9, 9));
-    strip.setPixelColor(270, strip.Color(random(0, 150), 9, 9));
-        strip.setPixelColor(278, strip.Color(random(0, 150), 9, 9));
+  strip.setPixelColor(270, strip.Color(random(0, 150), 9, 9));
+//  strip.setPixelColor(278, strip.Color(random(0, 150), 9, 9));
+//
+//    strip.setPixelColor(300, strip.Color(random(0, 150), 9, 9));
+//  strip.setPixelColor(500, strip.Color(random(0, 150), 9, 9));
+    strip.show();
 
 
   long timeDelta;
   unsigned long currentMillis = millis();
-  Serial.println("current millis at top of loop");
-  Serial.println(currentMillis);
+
 
 
   int  sensorValue0 = analogRead(A0);
@@ -127,97 +135,91 @@ void loop() {
   int  sensorValue4 = analogRead(A1);
   int mappedPotValue4 = map(sensorValue4, 0, 1023, 11, 3);
   //  int mappedPotValue3 = 9;
-//    Serial.println("mapping - previous");
-//    Serial.println(mappedPotValue0);
-//    Serial.println(previousValue0);
+  //    Serial.println("mapping - previous");
+  //    Serial.println(mappedPotValue0);
+  //    Serial.println(previousValue0);
 
 
-  //    Serial.println("checking 0 pot value");
-  //    if ( abs(mappedPotValue0 - previousValue0) > 5 &&  !echoInMovement[0]) {
-  //      echoInMovement[0] = true;
-  //      xAxisEchoOrigin[0] = 0;
-  //      previousValue0 = mappedPotValue0;
-  //      if (echoCounters[4] == 10) {
-  //        clearPixels(4);
-  //
-  //      }
-  //
-  //    }
-  //
-  //    if ( echoInMovement[0]) {
-  //      clearPixels(0);
-  //
-  //      drawEchoMovement(0, mappedPotValue0, currentMillis);
-  //
-  //    } else if (!echoCollisionTriggerLookup[0]) {
-  //
-  //      drawEchoAnimation(0, currentMillis);
-  //
-  //    }
-
-  //    runDrawSequence(0, mappedPotValue0, currentMillis);
-  //    runDrawSequence(1, mappedPotValue1, currentMillis);
-  //    runDrawSequence(4, mappedPotValue4, currentMillis);
-
-
-  runDrawSequence(0, mappedPotValue0, currentMillis);
-  runDrawSequence(3, mappedPotValue1, currentMillis);
-  runDrawSequence(4, mappedPotValue4, currentMillis);
+//  runDrawSequence(0, mappedPotValue0, currentMillis);
+//  runDrawSequence(3, mappedPotValue1, currentMillis);
+//  runDrawSequence(4, mappedPotValue4, currentMillis);
   timeDelta = currentMillis - previousMillis;
-//  Serial.println(timeDelta);
+  //  Serial.println(timeDelta);
   if (timeDelta < 200 && echoCounters[0] == 1 && !echoInMovement[0]) {
     drawEchoAnimation(0, currentMillis);
-//    runDrawSequence(0, mappedPotValue0, currentMillis);
-    //    fillSquare(0, 5, 5, 1);
-    // drawEchoAnimation(0, currentMillis);
-    //  drawEchoAnimation(1, currentMillis);
-     drawEchoAnimation(3, currentMillis);
-     drawEchoAnimation(4, currentMillis);
+    drawEchoAnimation(3, currentMillis);
+    drawEchoAnimation(4, currentMillis);
+    strip.show();
+    stageOne = false;
 
-//    Serial.println("1000");
-    //    strip.show();
 
   }
 
-  if (timeDelta > 223 && timeDelta < 2000 && echoCounters[0] == 2 && !echoInMovement[0]) {
-//    runDrawSequence(0, mappedPotValue0, currentMillis);
-
-//    Serial.println("2000");
+  if (timeDelta > 700 && timeDelta < 750 && stageTwo && !echoInMovement[0]) {
     drawEchoAnimation(0, currentMillis);
-    //    fillSquare(1, 10, 10, 1);
-    // drawEchoAnimation(0, currentMillis);
-    // drawEchoAnimation(1, currentMillis);
-     drawEchoAnimation(3, currentMillis);
-      drawEchoAnimation(4, currentMillis);
-
-
-    //    strip.show();
+    drawEchoAnimation(3, currentMillis);
+    drawEchoAnimation(4, currentMillis);
+    stageTwo = false;
+    strip.show();
 
   }
 
-  if (currentMillis - previousMillis > 300 && !echoInMovement[0]) {
-//    runDrawSequence(0, mappedPotValue0, currentMillis);
+  if (timeDelta > 1000 && !echoInMovement[0] && stageThree) {
     drawEchoAnimation(0, currentMillis);
+    stageThree = false;
+//
+    drawEchoAnimation(3, currentMillis);
+    drawEchoAnimation(4, currentMillis);
+//        previousMillis = currentMillis;
 
-    previousMillis = currentMillis;
-    //     drawEchoAnimation(0, currentMillis);
-    //      drawEchoAnimation(1, currentMillis);
-     drawEchoAnimation(3, currentMillis);
-      drawEchoAnimation(4, currentMillis);
+    strip.show();
+  }
+    Serial.println("timeDelta before reset ");
+  Serial.println(timeDelta);
+  if (currentMillis - previousMillis > 1500 && !echoInMovement[0]) {
+        previousMillis = currentMillis;
+        stageOne = true;
+        stageTwo = true;
+        stageThree = true;
 
-
-//    Serial.println("5000");
-    //    clearPixels(0);
-    //    clearPixels(1);
-
-
+    strip.show();
+//    delay(500);
   }
 
-  strip.show();
+  Serial.println("timeDelta at bottom of loop");
+  Serial.println(timeDelta);
+  
 
 
 }
 
+
+//void run(int echoIndex, long timeDelta) {
+//  if (timeDelta < 200 && echoCounters[0] == 1 && !echoInMovement[echoIndex]) {
+//    drawEchoAnimation(echoIndex, currentMillis);
+//
+//  }
+//
+//  if (timeDelta > 223 && timeDelta < 2000 && echoCounters[echoIndex] == 2 && !echoInMovement[echoIndex]) {
+//    drawEchoAnimation(0, currentMillis);
+//    drawEchoAnimation(3, currentMillis);
+//    drawEchoAnimation(4, currentMillis);
+//
+//  }
+//
+//  if (timeDelta > 300 && !echoInMovement[0]) {
+//    drawEchoAnimation(0, currentMillis);
+//    previousMillis = currentMillis;
+//
+//    drawEchoAnimation(3, currentMillis);
+//    drawEchoAnimation(4, currentMillis);
+//  }
+//
+//
+//
+//
+//
+//}
 
 void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) {
 
@@ -252,21 +254,21 @@ void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) 
 
   // If we're in movement cycle clear the trail and draw the next phase
   if ( echoInMovement[echoIndex]) {
-    
-      long previousMillis = echoPreviousMillisTracker[echoIndex];
-//    Serial.print("prev mill ; ");
-//    Serial.println(previousMillis);
-//    Serial.print("currentMillis  ; ");
-//    Serial.println(currentMillis);
-//    Serial.println("time delta  ; ");
-//    Serial.println(currentMillis - previousMillis);
-  if (currentMillis - previousMillis > 50) {
-    clearPixels(echoIndex);
-    drawEchoMovement(echoIndex, potentiometerValue, currentMillis);
-//    delay(1000);
-    echoPreviousMillisTracker[echoIndex] = currentMillis;
 
-  }
+    long previousMillis = echoPreviousMillisTracker[echoIndex];
+    //    Serial.print("prev mill ; ");
+    //    Serial.println(previousMillis);
+    //    Serial.print("currentMillis  ; ");
+    //    Serial.println(currentMillis);
+    //    Serial.println("time delta  ; ");
+    //    Serial.println(currentMillis - previousMillis);
+    if (currentMillis - previousMillis > 50) {
+      clearPixels(echoIndex);
+      drawEchoMovement(echoIndex, potentiometerValue, currentMillis);
+      //    delay(1000);
+      echoPreviousMillisTracker[echoIndex] = currentMillis;
+
+    }
 
   } else if (!echoCollisionTriggerLookup[echoIndex]) {
 
@@ -282,7 +284,7 @@ void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) 
       }
     }
 
-//    drawEchoAnimation(echoIndex, currentMillis);
+    //    drawEchoAnimation(echoIndex, currentMillis);
 
   }
 }
@@ -295,44 +297,44 @@ void runDrawSequence(int echoIndex, int potentiometerValue, long currentMillis) 
 
 void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
-        Serial.print("Analog value is ; ");
-        Serial.println(mappedPotValue);
-        Serial.print("X ; ");
-        Serial.println(xAxisEchoOrigin[echoIndex]);
-        Serial.print("Y ; ");
-        Serial.println(yAxisEchoOrigin[echoIndex]);
-    fillSquare(echoIndex, xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1);
-    if (echoDirectionLookup[echoIndex] == 'y') {
-            Serial.println("in here helllloooooo");
+  Serial.print("Analog value is ; ");
+  Serial.println(mappedPotValue);
+  Serial.print("X ; ");
+  Serial.println(xAxisEchoOrigin[echoIndex]);
+  Serial.print("Y ; ");
+  Serial.println(yAxisEchoOrigin[echoIndex]);
+  fillSquare(echoIndex, xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1);
+  if (echoDirectionLookup[echoIndex] == 'y') {
+    Serial.println("in here helllloooooo");
 
-      xAxisEchoOrigin[echoIndex] += 1;
-      if (xAxisEchoOrigin[echoIndex] >= mappedPotValue) {
-        echoInMovement[echoIndex] = false;
-                Serial.print("done with echo movement across board on x axis" );
-        //        Serial.println(xAxisEchoOrigin[echoIndex]);
-//        delay(1000);
-        clearPixels(echoIndex);
+    xAxisEchoOrigin[echoIndex] += 1;
+    if (xAxisEchoOrigin[echoIndex] >= mappedPotValue) {
+      echoInMovement[echoIndex] = false;
+      Serial.print("done with echo movement across board on x axis" );
+      //        Serial.println(xAxisEchoOrigin[echoIndex]);
+      //        delay(1000);
+      clearPixels(echoIndex);
 
-      }
-    } else {
-      yAxisEchoOrigin[echoIndex] -= 1;
-      //      Serial.println(yAxisEchoOrigin[echoIndex]);
-      if (yAxisEchoOrigin[echoIndex] <= mappedPotValue  ) {
-        echoInMovement[echoIndex] = false;
-        Serial.println("done with echo movement across board on y axis");
-        
-        
-        clearPixels(echoIndex);
+    }
+  } else {
+    yAxisEchoOrigin[echoIndex] -= 1;
+    //      Serial.println(yAxisEchoOrigin[echoIndex]);
+    if (yAxisEchoOrigin[echoIndex] <= mappedPotValue  ) {
+      echoInMovement[echoIndex] = false;
+      Serial.println("done with echo movement across board on y axis");
 
 
-      }
+      clearPixels(echoIndex);
 
 
     }
-        Serial.println("Reseting this");
-    //    clearPixels(echoIndex);
 
-  
+
+  }
+  Serial.println("Reseting this");
+  //    clearPixels(echoIndex);
+
+
 }
 
 
@@ -437,13 +439,9 @@ void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
 
   }
 
-
-
-
   if (counter > 2 && counter != 10 ) {
-    //      Serial.println("clearing");
     clearPixels(echoLookupIndex);
-//    echoPreviousMillisTracker[echoLookupIndex] = currentMillis;
+    
   }
 
 
@@ -457,8 +455,6 @@ void drawEchoAnimation(int echoLookupIndex, long currentMillis) {
 bool pixelHasValue(int pixel) {
 
   return  strip.getPixelColor(pixel) != 0;
-  //  Serial.println(strip.getPixelColor(pixel));
-  //  return false;
 
 }
 int offset = 0;
@@ -503,6 +499,7 @@ void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int lev
         if (echoLookupIndex != 5 ) {
           if (ledLocation < 270) {
             strip.setPixelColor(ledLocation, strip.Color(50, pixelHueg, 50));
+            usbMIDI.sendNoteOn(61, 100, echoLookupIndex+1);
 
 
           }
@@ -548,6 +545,7 @@ void clearPixels(int echoLookupIndex) {
 
 
   }
+   usbMIDI.sendNoteOff(61, 0, echoLookupIndex+1);  // 60 = C4
 
   //  for (int x = 0; x < kMatrixWidth; x++) {
   //    for (int y = 0; y < kMatrixHeight; y++) {
