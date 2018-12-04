@@ -98,18 +98,18 @@ void setup() {
   strip.begin();
   matrix->show(); // Initialize all pixels to 'off'
   Serial.begin(9600);
-  createEcho( 0, 4, 8, 'y');
+  createEcho( 0, 3, 3, 'y');
   // 1 is coming from the y axis and is closer to the bottom
-  createEcho( 1, 13, 9, 'y');
+  createEcho( 1, 3, 7, 'y');
   Serial.println("!!");
 
   // 2 is coming from x axis and is closest to the left
-  createEcho( 2, 21, 7, 'x');
+  createEcho( 2, 3, 11, 'y');
   // 3 is coming from the x axis and is in the middle
-  createEcho( 3, 9, 10, 'x');
+  createEcho( 3, 15, 10, 'x');
 
   // 4is coming from the x axis and is closest to the right
-  createEcho( 4, 14, 10, 'x');
+  createEcho( 4, 25, 10, 'x');
 
   // put your setup code here, to run once:
   int pixelHue = 200;
@@ -149,7 +149,7 @@ bool stageOne  = true;
 bool stageThree  = true;
 bool stageFour  = true;
 
-int NUM_ECHOES = 3;
+int NUM_ECHOES = 5;
 void loop() {
 
 
@@ -161,7 +161,7 @@ void loop() {
 
 
 
-  int  sensorValue0 = analogRead(A0);
+  int  sensorValue0 = analogRead(A2);
   int mappedPotValue0 = map(sensorValue0, 0, 1023, 3, 47);
 
   if (abs(mappedPotValue0 - previousValue0) > 3) {
@@ -170,7 +170,7 @@ void loop() {
     Serial.print("changin 0 x axis origin to ");
     Serial.println(mappedPotValue0);
     previousValue0 = mappedPotValue0;
-        usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
+    usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
 
 
 
@@ -190,26 +190,26 @@ void loop() {
 
   //Play first tone
   if (timeDelta > 857 && !echoInMovement[0] && stageOne) {
-//    drawEchoAnimation(0);
+    //    drawEchoAnimation(0);
 
     //    drawEchoAnimation(1);
     //    drawEchoAnimation(2);
-    for(int index =0; index < NUM_ECHOES; index++) {
-       drawEchoAnimation(index);
-      
-      }
+    for (int index = 0; index < NUM_ECHOES; index++) {
+      drawEchoAnimation(index);
+
+    }
     matrix->show();
-    stageOne = false; 
+    stageOne = false;
 
 
   }
-    //Play second tone
+  //Play second tone
   if (timeDelta > 857 * 2  && stageTwo && !echoInMovement[0]) {
-    for(int index =0; index < NUM_ECHOES; index++) {
-       drawEchoAnimation(index);
-      
-      }
-//    drawEchoAnimation(0);
+    for (int index = 0; index < NUM_ECHOES; index++) {
+      drawEchoAnimation(index);
+
+    }
+    //    drawEchoAnimation(0);
     //    drawEchoAnimation(1);
     //    drawEchoAnimation(2);
 
@@ -218,30 +218,30 @@ void loop() {
 
   }
 
-  
-    //Play third tone
+
+  //Play third tone
   if (timeDelta > 857 * 3 && !echoInMovement[0] && stageThree) {
-//    drawEchoAnimation(0);
+    //    drawEchoAnimation(0);
     //    drawEchoAnimation(1);
     //    drawEchoAnimation(2);
-    for(int index =0; index < NUM_ECHOES; index++) {
-       drawEchoAnimation(index);
-      
-      }
+    for (int index = 0; index < NUM_ECHOES; index++) {
+      drawEchoAnimation(index);
+
+    }
     matrix->show();
     stageThree = false;
 
 
   }
 
-  
-    //Play clear color and play last tone
+
+  //Play clear color and play last tone
   if (timeDelta > 857 * 4 && !echoInMovement[0] && stageFour) {
 
-    for(int index =0; index < NUM_ECHOES; index++) {
-       drawEchoAnimation(index);
-      
-      }
+    for (int index = 0; index < NUM_ECHOES; index++) {
+      drawEchoAnimation(index);
+
+    }
     matrix->show();
     stageFour = false;
     Serial.println("resetting pixels");
@@ -498,21 +498,21 @@ void drawEchoAnimation(int echoLookupIndex) {
   int xIndex = xAxisEchoOrigin[echoLookupIndex];
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
   Serial.println(160 - counter * 35);
-  if (counter <= 3 ) {
-    matrix->drawCircle(xIndex, yIndex, counter, LED_COLORS[random(0, 6)]);
+  if (counter == 1) {
+    matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 6)]);
+    echoCounters[echoLookupIndex]++;
+    usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
+  } else if (counter <= 3 && counter > 1 ) {
+    matrix->drawCircle(xIndex, yIndex, counter-1, LED_COLORS[random(0, 6)]);
     echoCounters[echoLookupIndex]++;
     usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
 
-  } else if (counter == 49) {
-    randomizeEcho(echoLookupIndex);
   }
-
-
   if (counter > 3 ) {
     Serial.println("resetting");
     matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
     matrix->drawCircle( xIndex, yIndex, 2, LED_BLACK);
-    matrix->drawCircle( xIndex, yIndex, 3, LED_BLACK);
+    matrix->drawPixel(xIndex, yIndex, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
     usbMIDI.sendNoteOn(61, 10 , echoLookupIndex + 1);
     matrix->show();
@@ -530,65 +530,6 @@ bool pixelHasValue(int pixel) {
 
 }
 int offset = 0;
-
-
-void randomizeEcho(int echoLookupIndex) {
-
-  //  leds[pixelsInEcho[echoLookupIndex][random(0, 48)]] = CHSV( random(0, 255), 200, 255);
-  //  FastLED.show();
-
-
-}
-
-//void fillSquare(int echoLookupIndex, int xCoordinate, int  yCoordinate,  int level) {
-//  int pixelHuer = random(0, 190);
-//  int pixelHueg = random(0, 150);
-//  int pixelHueb = random(0, 190);
-//  int arrayCounter = 0;
-//  offsetLookup[echoLookupIndex] = level;
-//
-//  if (level == 1) {
-//
-//    offset = 3;
-//
-//  } else if (level == 2) {
-//    offset = 5;
-//
-//  } else if (level == 3) {
-//
-//    offset = 7;
-//  }
-//
-//  for (int x = 0; x < offset; x++) {
-//    int xindex = xCoordinate - level + x;
-//    for (int i = 0; i < offset; i++) {
-//      int yindex = yCoordinate - level + i;
-//      int ledLocation = XY(xindex, yindex);
-//
-//      // If nothing is drawn there
-//
-//      if (!pixelHasValue(ledLocation)) {
-//        if (echoLookupIndex != 5 ) {
-//          if (ledLocation < 270) {
-//            strip.setPixelColor(ledLocation, strip.Color(50, pixelHueg, 50));
-//            usbMIDI.sendNoteOn(61, 100, echoLookupIndex + 1);
-//
-//
-//          }
-//        }
-//
-//      } else {
-//      }
-//
-//      pixelsInEcho[echoLookupIndex][arrayCounter] = ledLocation;
-//      arrayCounter++;
-//
-//
-//    }
-//  }
-//}
-//
-
 
 
 void createEcho(int index, int x, int y, char c) {
@@ -613,8 +554,8 @@ void clearPixels(int echoLookupIndex) {
   echoCounters[echoLookupIndex] = 1;
   matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
   matrix->drawCircle( xIndex, yIndex, 2, LED_BLACK);
-  matrix->drawCircle( xIndex, yIndex, 3, LED_BLACK);
-usbMIDI.sendNoteOff(61, 0, echoLookupIndex + 1); // 60 = C4
+  matrix->drawPixel(xIndex, yIndex, LED_BLACK);
+  usbMIDI.sendNoteOff(61, 0, echoLookupIndex + 1); // 60 = C4
 
 }
 
