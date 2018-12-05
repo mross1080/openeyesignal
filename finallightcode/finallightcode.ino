@@ -58,7 +58,7 @@
 #define NUM_LEDS    700
 //CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
-const int LED_COLORS[7] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_ORANGE_MEDIUM, LED_BLUE_MEDIUM, LED_GREEN_MEDIUM, LED_RED_MEDIUM};
+const int LED_COLORS[4] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM};
 const uint8_t kMatrixWidth = 50;
 const uint8_t kMatrixHeight = 14;
 const bool    kMatrixSerpentineLayout = true;
@@ -128,7 +128,9 @@ long previousMovementTime = 0;
 
 int NUM_ECHOES = 5;
 void loop() {
-
+  while (usbMIDI.read()) {
+    // ignore incoming messages
+  }
 
 
   long timeDelta;
@@ -138,20 +140,20 @@ void loop() {
   //    Serial.println( currentMillis);
 
   int  sensorValue0 =  analogRead(A0);
-  int mappedPotValue0 = map(sensorValue0, 0, 1023, 3, 47);
+  int mappedPotValue0 = map(sensorValue0, 0, 1023, 0, 47);
   //
   //
   int  sensorValue1 =  analogRead(A3);
-  int mappedPotValue1 = map(sensorValue1, 0, 1023, 3, 47);
+  int mappedPotValue1 = map(sensorValue1, 0, 1023, 0, 47);
   int  sensorValue2 = analogRead(A7);
-  int mappedPotValue2 = map(sensorValue2, 0, 1023, 12, 1);
+  int mappedPotValue2 = map(sensorValue2, 0, 1023, 13, 1);
   int  sensorValue3 = analogRead(A1);
-  int mappedPotValue3 = map(sensorValue3, 0, 1023, 12, 1);
+  int mappedPotValue3 = map(sensorValue3, 0, 1023, 13, 1);
 
   int  sensorValue4 = analogRead(A5);
-  int mappedPotValue4 = map(sensorValue4, 0, 1023, 12, 1);
+  int mappedPotValue4 = map(sensorValue4, 0, 1023, 13, 1);
 
-  if (abs(mappedPotValue0 - previousValue0) > 2) {
+  if (abs(mappedPotValue0 - previousValue0) > 1) {
     clearPixels(0);
     echoCounters[0] = 500;
 
@@ -160,7 +162,7 @@ void loop() {
 
   }
 
-  if (abs(mappedPotValue1 - previousValue1) > 2) {
+  if (abs(mappedPotValue1 - previousValue1) > 1) {
 
     clearPixels(1);
     echoCounters[1] = 500;
@@ -208,7 +210,8 @@ void loop() {
 
     }
 
-    if (abs(xAxisEchoOrigin[1] - previousValue1) > 2) {
+    //    if (abs(xAxisEchoOrigin[1] - previousValue1) > 2) {
+    if (xAxisEchoOrigin[1] != previousValue1) {
       Serial.println("POT MOVE~~!~~~~~!!!!");
       Serial.print("x axis value 1 is ; ");
       Serial.println(xAxisEchoOrigin[1]);
@@ -364,7 +367,7 @@ void checkForCollisions(int echoLookupIndex) {
     double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
     int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
     int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
-    if (originDistance < 4 && echoCounters[echoLookupIndex] != 100) {
+    if (originDistance < 6 && echoCounters[echoLookupIndex] != 100) {
 
       clearPixels(index);
       xAxisEchoOrigin[echoLookupIndex] = midpointX;
@@ -380,7 +383,7 @@ void checkForCollisions(int echoLookupIndex) {
       echoCounters[index] = 100;
       collisionLookupMap[index] = echoLookupIndex;
       collisionLookupMap[echoLookupIndex] = index;
-      matrix->fillCircle(midpointX, midpointY, 3, LED_COLORS[random(0, 6)]);
+      matrix->fillCircle(midpointX, midpointY, 3, LED_COLORS[random(0, 3)]);
 
       //    } else if (originDistance < 6 && echoCounters[index] == 100) {
       //      xAxisEchoOrigin[echoLookupIndex] = midpointX;
@@ -416,13 +419,13 @@ void drawEchoAnimation(int echoLookupIndex) {
   int counter = echoCounters[echoLookupIndex];
   int xIndex = xAxisEchoOrigin[echoLookupIndex];
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
-  if (!(xIndex == 0 || yIndex == 17)) {
+  if (!(xIndex == 0 || yIndex > 11)) {
     if (counter == 1) {
-      matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 6)]);
+      matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 3)]);
       echoCounters[echoLookupIndex]++;
       usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
     } else if (counter <= 3 && counter > 1 ) {
-      matrix->drawCircle(xIndex, yIndex, counter - 1, LED_COLORS[random(0, 6)]);
+      matrix->drawCircle(xIndex, yIndex, counter - 1, LED_COLORS[random(0, 3)]);
       echoCounters[echoLookupIndex]++;
       usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
 
@@ -431,7 +434,7 @@ void drawEchoAnimation(int echoLookupIndex) {
       //      xAxisEchoOrigin[echoLookupIndex] += random(-1,1);
       //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
 
-      matrix->fillCircle(xIndex, yIndex, 3, LED_COLORS[random(0, 6)]);
+      matrix->fillCircle(xIndex, yIndex, 3, LED_COLORS[random(0, 3)]);
 
       usbMIDI.sendNoteOn(61, 100 , 11);
 
@@ -440,7 +443,7 @@ void drawEchoAnimation(int echoLookupIndex) {
       //      xAxisEchoOrigin[echoLookupIndex] += random(-1,1);
       //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
       //      Serial.println("moving x axis");
-      matrix->fillCircle(xIndex, yIndex, 1, LED_COLORS[random(0, 6)]);
+      matrix->fillCircle(xIndex, yIndex, 1, LED_COLORS[random(0, 3)]);
 
       usbMIDI.sendNoteOn(61, 100 , 13);
 
@@ -506,6 +509,8 @@ void clearPixels(int echoLookupIndex) {
     echoCounters[relatedIndex] = 1;
     matrix->fillCircle(xAxisEchoOrigin[relatedIndex], yAxisEchoOrigin[relatedIndex], 3, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
+    usbMIDI.sendNoteOff(61, 0 , 11);
+    usbMIDI.sendNoteOff(61, 0 , 13);
 
   } else if (counter == 500) {
 
@@ -556,7 +561,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
 
       }
-      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 6)]);
+      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
       //If you want a trail of echo comment this function call out
       //    clearPixels(echoIndex);
       matrix->show();
@@ -586,7 +591,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
 
       }
-      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 6)]);
+      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
       //If you want a trail of echo comment this function call out
       //    clearPixels(echoIndex);
       matrix->show();
