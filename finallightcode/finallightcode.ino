@@ -159,7 +159,6 @@ void loop() {
   if (abs(mappedPotValue1 - previousValue1) > 2) {
     Serial.println("changed in pot value");
     clearPixels(1);
-    xAxisEchoOrigin[1] = mappedPotValue1;
     echoCounters[1] = 500;
     previousValue1 = mappedPotValue1;
     //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
