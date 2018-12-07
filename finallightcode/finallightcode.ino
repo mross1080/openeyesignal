@@ -155,75 +155,75 @@ void loop() {
   int mappedPotValue4 = map(sensorValue4, 0, 1023, 13, 0);
   //  Serial.println("n pot value 3 ");
   //  Serial.print(mappedPotValue3);
-    movementTimeDelta = currentMillis - previousMovementTime;
+  movementTimeDelta = currentMillis - previousMovementTime;
   //
   if (movementTimeDelta > 250) {
-  if (abs(mappedPotValue0 - previousValue0) > 1) {
-    //    Serial.println("changed in pot value 0 moving");
-    //    Serial.print(mappedPotValue0);
-    //    Serial.println("old value of pot : ");
-    //    Serial.print(previousValue0);
-    clearPixels(0);
-    echoCounters[0] = 500;
-    yAxisEchoOrigin[0] = yAxisEchoDefault[0];
+    if (abs(mappedPotValue0 - previousValue0) > 1) {
+      //    Serial.println("changed in pot value 0 moving");
+      //    Serial.print(mappedPotValue0);
+      //    Serial.println("old value of pot : ");
+      //    Serial.print(previousValue0);
+      clearPixels(0);
+      echoCounters[0] = 500;
+      yAxisEchoOrigin[0] = yAxisEchoDefault[0];
 
-    previousValue0 = mappedPotValue0;
-    usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
+      previousValue0 = mappedPotValue0;
+      usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
 
-  }
+    }
 
-  if (abs(mappedPotValue1 - previousValue1) > 2 ) {
+    if (abs(mappedPotValue1 - previousValue1) > 2 ) {
 
-    clearPixels(1);
-    echoCounters[1] = 500;
+      clearPixels(1);
+      echoCounters[1] = 500;
 
-    previousValue1 = mappedPotValue1;
-    yAxisEchoOrigin[1] = yAxisEchoDefault[1];
-    //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
-
-
-  }
+      previousValue1 = mappedPotValue1;
+      yAxisEchoOrigin[1] = yAxisEchoDefault[1];
+      //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
 
 
+    }
 
-  if (abs(mappedPotValue2 - previousValue2) > 2) {
 
-    Serial.println("changed in pot value");
-    clearPixels(2);
-    echoCounters[2] = 500;
-    previousValue2 = mappedPotValue2;
-    //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
 
-  }
-  Serial.print(" sensor2 : ");
-//  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
-Serial.println(sensorValue2);
+    if (abs(mappedPotValue2 - previousValue2) > 2) {
 
-  if (abs(mappedPotValue3 - previousValue3) > 2) {
-    //if (calculateDistance(xAxisEchoOrigin[3],yAxisEchoOrigin[3],xAxisEchoOrigin[3],mappedPotValue3) > 3) {
+      Serial.println("changed in pot value");
+      clearPixels(2);
+      echoCounters[2] = 500;
+      previousValue2 = mappedPotValue2;
+      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
 
-    //           Serial.println("changed in pot value 0 moving");
-    //        Serial.print(mappedPotValue0);
-    //        Serial.println("old value of pot : ");
-    //        Serial.print(previousValue0);
-    //        Serial.println("!!!!!!");
-    //        delay(5000);
-    clearPixels(0);
-    clearPixels(3);
-    echoCounters[3] = 500;
-    previousValue3 = mappedPotValue3;
-    //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+    }
+    Serial.print(" sensor2 : ");
+    //  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
+    Serial.println(sensorValue2);
 
-  }
+    if (abs(mappedPotValue3 - previousValue3) > 2) {
+      //if (calculateDistance(xAxisEchoOrigin[3],yAxisEchoOrigin[3],xAxisEchoOrigin[3],mappedPotValue3) > 3) {
 
-  if (abs(mappedPotValue4 - previousValue4) > 2) {
-    Serial.println("changed in pot value");
-    clearPixels(4);
-    echoCounters[4] = 500;
-    previousValue4 = mappedPotValue4;
-    //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+      //           Serial.println("changed in pot value 0 moving");
+      //        Serial.print(mappedPotValue0);
+      //        Serial.println("old value of pot : ");
+      //        Serial.print(previousValue0);
+      //        Serial.println("!!!!!!");
+      //        delay(5000);
+      clearPixels(0);
+      clearPixels(3);
+      echoCounters[3] = 500;
+      previousValue3 = mappedPotValue3;
+      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
 
-  }
+    }
+
+    if (abs(mappedPotValue4 - previousValue4) > 2) {
+      Serial.println("changed in pot value");
+      clearPixels(4);
+      echoCounters[4] = 500;
+      previousValue4 = mappedPotValue4;
+      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+
+    }
 
 
     if (xAxisEchoOrigin[0] != previousValue0) {
@@ -393,7 +393,7 @@ void checkForCollisions(int echoLookupIndex) {
     //      Serial.println(sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2)));
     //    }
 
-    
+
     // find distance between origin of echoes
 
     double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
@@ -474,25 +474,25 @@ void drawEchoAnimation(int echoLookupIndex) {
   } else if (counter == 500) {
     // Draw echo movement and trail
 
-    
+
     //      matrix->fillCircle(xIndex, yIndex, 3, LED_BLACK);
     //      xAxisEchoOrigin[echoLookupIndex] += random(-1,1);
     //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
     //      Serial.println("moving x axis");
     int color = LED_COLORS[random(0, 3)];
-//    matrix->drawPixel(xIndex, yIndex+2,color);
+    //    matrix->drawPixel(xIndex, yIndex+2,color);
     matrix->fillCircle(xIndex, yIndex, 1, color);
-    matrix->show();
-//    if (echoDirectionLookup[echoLookupIndex] == 'y') {
-//
-//      matrix->drawPixel(xIndex - 1, yIndex, color);
-//      matrix->drawPixel(xIndex - 2, yIndex, color);
-//    } else {
-//      matrix->drawPixel(xIndex, yIndex - 1, color);
-//      matrix->drawPixel(xIndex, yIndex - 2, color);
-//
-//    }
-//    
+
+    //    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+    //
+    //      matrix->drawPixel(xIndex - 1, yIndex, color);
+    //      matrix->drawPixel(xIndex - 2, yIndex, color);
+    //    } else {
+    //      matrix->drawPixel(xIndex, yIndex - 1, color);
+    //      matrix->drawPixel(xIndex, yIndex - 2, color);
+    //
+    //    }
+    //
 
 
     usbMIDI.sendNoteOn(61, 100 , 13);
@@ -572,6 +572,7 @@ void clearPixels(int echoLookupIndex) {
 
     matrix->fillCircle( xIndex, yIndex, 2, LED_BLACK);
 
+
   } else {
 
 
@@ -617,6 +618,10 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
 
       }
+      int xIndex = xAxisEchoOrigin[echoIndex];
+      int yIndex = yAxisEchoOrigin[echoIndex];
+      int color = LED_COLORS[random(0, 3)];
+      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
       matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
       //If you want a trail of echo comment this function call out
       //    clearPixels(echoIndex);
@@ -647,9 +652,13 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
 
       }
-      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
+      int xIndex = xAxisEchoOrigin[echoIndex];
+      int yIndex = yAxisEchoOrigin[echoIndex];
+      int color = LED_COLORS[random(0, 3)];
+      matrix->drawLine(xIndex, yIndex, xIndex , 14, color);
+      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, color);
       //If you want a trail of echo comment this function call out
-      //    clearPixels(echoIndex);
+      //          clearPixels(echoIndex);
       matrix->show();
 
       Serial.print("comparing analog value to determine if reached end of movement | analog : ");
