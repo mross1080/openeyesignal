@@ -188,7 +188,7 @@ void loop() {
       previousValue1 = mappedPotValue1;
       yAxisEchoOrigin[1] = yAxisEchoDefault[1];
       //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
-        checkAndResetCollisions(1);
+      checkAndResetCollisions(1);
       checkAndResetCollisions(2);
       checkAndResetCollisions(3);
       checkAndResetCollisions(4);
@@ -199,14 +199,14 @@ void loop() {
 
 
     if (abs(mappedPotValue2 - previousValue2) > 2) {
-      
+
 
       Serial.println("changed in pot value");
       clearPixels(2);
       echoCounters[2] = 500;
       previousValue2 = mappedPotValue2;
       //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
-        checkAndResetCollisions(0);
+      checkAndResetCollisions(0);
       checkAndResetCollisions(2);
       checkAndResetCollisions(1);
 
@@ -228,15 +228,15 @@ void loop() {
       clearPixels(3);
       echoCounters[3] = 500;
       previousValue3 = mappedPotValue3;
-//      Serial.print("moved 3 the reference collision index is : " );
-//      Serial.println(collisionLookupMap[3]);
-//      Serial.print("the default y value for that one is : " );
-//      Serial.println(yAxisEchoDefault[collisionLookupMap[3]]);
+      //      Serial.print("moved 3 the reference collision index is : " );
+      //      Serial.println(collisionLookupMap[3]);
+      //      Serial.print("the default y value for that one is : " );
+      //      Serial.println(yAxisEchoDefault[collisionLookupMap[3]]);
       xAxisEchoOrigin[3] = xAxisEchoDefault[3];
       yAxisEchoOrigin[collisionLookupMap[3]] = yAxisEchoDefault[collisionLookupMap[3]];
       //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
 
-              checkAndResetCollisions(0);
+      checkAndResetCollisions(0);
       checkAndResetCollisions(3);
       checkAndResetCollisions(1);
 
@@ -248,7 +248,7 @@ void loop() {
       echoCounters[4] = 500;
       previousValue4 = mappedPotValue4;
       //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
-                checkAndResetCollisions(0);
+      checkAndResetCollisions(0);
       checkAndResetCollisions(4);
       checkAndResetCollisions(1);
 
@@ -258,15 +258,15 @@ void loop() {
     if (xAxisEchoOrigin[0] != previousValue0) {
       matrix->fillCircle( xAxisEchoOrigin[0], yAxisEchoOrigin[0], 1, LED_BLACK);
       drawEchoMovement(0, mappedPotValue0, currentMillis);
-//      Serial.println("POT MOVE~~!~~~~~!!!!");
-//      Serial.print("x axis value 0 is ; ");
-//      Serial.println(xAxisEchoOrigin[0]);
-//      Serial.print("moving point to  ; ");
-//      Serial.println(previousValue0);
-//      Serial.print("Counter ");
-//      Serial.println(echoCounters[0]);
-//      Serial.print("abs diff ");
-//      Serial.println(abs(xAxisEchoOrigin[0] - previousValue0));
+      //      Serial.println("POT MOVE~~!~~~~~!!!!");
+      //      Serial.print("x axis value 0 is ; ");
+      //      Serial.println(xAxisEchoOrigin[0]);
+      //      Serial.print("moving point to  ; ");
+      //      Serial.println(previousValue0);
+      //      Serial.print("Counter ");
+      //      Serial.println(echoCounters[0]);
+      //      Serial.print("abs diff ");
+      //      Serial.println(abs(xAxisEchoOrigin[0] - previousValue0));
 
     }
 
@@ -370,7 +370,7 @@ void loop() {
     stageFour = true;
     matrix->show();
     checkForCollisions(0);
-    //    checkForCollisions(1);
+    checkForCollisions(1);
     //    checkForCollisions(3);
     previousMillis = currentMillis;
 
@@ -408,79 +408,79 @@ void checkForCollisions(int echoLookupIndex) {
     checkEndIndex = 5;
 
   }
-    for (int index = checkStartIndex; index < checkEndIndex; index++) {
+  for (int index = checkStartIndex; index < checkEndIndex; index++) {
 
-//  int index = 3;
-  // if there is a collision and the distance is less than 6
-  // register that new collision in absorbed and clear everything
-  // set counter to a new number and create a visualization for that
+    //  int index = 3;
+    // if there is a collision and the distance is less than 6
+    // register that new collision in absorbed and clear everything
+    // set counter to a new number and create a visualization for that
 
-  //    if ( echoCounters[echoLookupIndex] == 100) {
-  //      Serial.print("comparing with alt index");
-  //      Serial.println(index);
-  //      Serial.print("compare x : ");
-  //      Serial.println(xAxisEchoOrigin[index]);
-  //      Serial.print("compare y : ");
-  //      Serial.println(yAxisEchoOrigin[index]);
-  //
-  //      Serial.print("Distance : ");
-  //      Serial.println(sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2)));
-  //    }
-
-
-  // find distance between origin of echoes
-
-  double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
-  Serial.print("distance");
-  Serial.println(originDistance);
-  int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
-  int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
-  if (originDistance < 5 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  && echoCounters[index] != 100) {
-
-    clearPixels(index);
-    xAxisEchoOrigin[echoLookupIndex] = midpointX;
-    yAxisEchoOrigin[echoLookupIndex] = midpointY;
-    xAxisEchoOrigin[index] = midpointX;
-    yAxisEchoOrigin[index] = midpointY;
-
-    echoCounters[echoLookupIndex] = 100;
-    echoCounters[index] = 100;
-    collisionLookupMap[index] = echoLookupIndex;
-    collisionLookupMap[echoLookupIndex] = index;
-    matrix->fillCircle(midpointX, midpointY, 3, LED_COLORS[random(0, 3)]);
-
-  } else if (originDistance < 6 && echoCounters[index] == 100) {
-    //            xAxisEchoOrigin[echoLookupIndex] = 0;
-    //            yAxisEchoOrigin[echoLookupIndex] = 0;
-    //            xAxisEchoOrigin[index] = 0;
-    //            yAxisEchoOrigin[index] = 0;
-    //            xAxisEchoOrigin[collisionLookupMap[index]] = 0;
-    //            yAxisEchoOrigin[collisionLookupMap[index]] = 0;
-    //            echoCounters[echoLookupIndex] = 200;
-    //            echoCounters[index] = 200;
-    //            echoCounters[collisionLookupMap[index]] = 200;
-    Serial.println("HELLO");
-
-
-
-
-  } else {
-
-    //      if (echoDirectionLookup[echoLookupIndex] == 'y') {
-    //        collisionLookupMap[echoLookupIndex] = index;
-    //        yAxisEchoOrigin[collisionLookupMap[echoLookupIndex]] = yAxisEchoDefault[collisionLookupMap[echoLookupIndex]];
-    //        xAxisEchoOrigin[index] = xAxisEchoDefault[index];
+    //    if ( echoCounters[echoLookupIndex] == 100) {
+    //      Serial.print("comparing with alt index");
+    //      Serial.println(index);
+    //      Serial.print("compare x : ");
+    //      Serial.println(xAxisEchoOrigin[index]);
+    //      Serial.print("compare y : ");
+    //      Serial.println(yAxisEchoOrigin[index]);
     //
-    //      } else {
-    //        yAxisEchoOrigin[index] = yAxisEchoDefault[index];
-    //        xAxisEchoOrigin[collisionLookupMap[echoLookupIndex]] = xAxisEchoDefault[collisionLookupMap[echoLookupIndex]];
-    //
-    //
-    //      }
+    //      Serial.print("Distance : ");
+    //      Serial.println(sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2)));
+    //    }
 
-  }
+
+    // find distance between origin of echoes
+
+    double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
+    Serial.print("distance");
+    Serial.println(originDistance);
+    int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
+    int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
+    if (originDistance < 5 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  && echoCounters[index] != 100) {
+
+      clearPixels(index);
+      xAxisEchoOrigin[echoLookupIndex] = midpointX;
+      yAxisEchoOrigin[echoLookupIndex] = midpointY;
+      xAxisEchoOrigin[index] = midpointX;
+      yAxisEchoOrigin[index] = midpointY;
+
+      echoCounters[echoLookupIndex] = 100;
+      echoCounters[index] = 100;
+      collisionLookupMap[index] = echoLookupIndex;
+      collisionLookupMap[echoLookupIndex] = index;
+      matrix->fillCircle(midpointX, midpointY, 3, LED_COLORS[random(0, 3)]);
+
+    } else if (originDistance < 6 && echoCounters[index] == 100) {
+      //            xAxisEchoOrigin[echoLookupIndex] = 0;
+      //            yAxisEchoOrigin[echoLookupIndex] = 0;
+      //            xAxisEchoOrigin[index] = 0;
+      //            yAxisEchoOrigin[index] = 0;
+      //            xAxisEchoOrigin[collisionLookupMap[index]] = 0;
+      //            yAxisEchoOrigin[collisionLookupMap[index]] = 0;
+      //            echoCounters[echoLookupIndex] = 200;
+      //            echoCounters[index] = 200;
+      //            echoCounters[collisionLookupMap[index]] = 200;
+      Serial.println("HELLO");
+
+
+
+
+    } else {
+
+      //      if (echoDirectionLookup[echoLookupIndex] == 'y') {
+      //        collisionLookupMap[echoLookupIndex] = index;
+      //        yAxisEchoOrigin[collisionLookupMap[echoLookupIndex]] = yAxisEchoDefault[collisionLookupMap[echoLookupIndex]];
+      //        xAxisEchoOrigin[index] = xAxisEchoDefault[index];
+      //
+      //      } else {
+      //        yAxisEchoOrigin[index] = yAxisEchoDefault[index];
+      //        xAxisEchoOrigin[collisionLookupMap[echoLookupIndex]] = xAxisEchoDefault[collisionLookupMap[echoLookupIndex]];
+      //
+      //
+      //      }
 
     }
+
+  }
 
 }
 
@@ -489,23 +489,23 @@ void checkAndResetCollisions(int echoLookupIndex) {
   int relatedIndex  = collisionLookupMap[echoLookupIndex];
 
   if (echoDirectionLookup[echoLookupIndex] == 'y') {
-      yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
+    yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
 
 
-//    if (yAxisEchoDefault[echoLookupIndex] != yAxisEchoOrigin[echoLookupIndex]) {
-//        yAxisEchoOrigin[echoLookupIndex]
-//      
-//      
-//      
-//      }
-//    int currentRelatedXValue = xAxisEchoOrigin[relatedIndex];
-//
-//
-//
-//    matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+    //    if (yAxisEchoDefault[echoLookupIndex] != yAxisEchoOrigin[echoLookupIndex]) {
+    //        yAxisEchoOrigin[echoLookupIndex]
+    //
+    //
+    //
+    //      }
+    //    int currentRelatedXValue = xAxisEchoOrigin[relatedIndex];
+    //
+    //
+    //
+    //    matrix->drawLine(0, yIndex, xIndex , yIndex, color);
 
   } else {
-      xAxisEchoOrigin[echoLookupIndex] = xAxisEchoDefault[echoLookupIndex];
+    xAxisEchoOrigin[echoLookupIndex] = xAxisEchoDefault[echoLookupIndex];
 
 
   }
@@ -513,9 +513,9 @@ void checkAndResetCollisions(int echoLookupIndex) {
 
 
 
-//  yAxisEchoOrigin[collisionLookupMap[3]] = yAxisEchoDefault[collisionLookupMap[3]];
+  //  yAxisEchoOrigin[collisionLookupMap[3]] = yAxisEchoDefault[collisionLookupMap[3]];
 
-//
+  //
 
 
 
@@ -539,12 +539,10 @@ void drawEchoAnimation(int echoLookupIndex) {
     echoCounters[echoLookupIndex] = counter;
 
   }
-// if (counter != 100) {
-//      checkAndResetCollisions(echoLookupIndex);
-//  
-//  }
-  
+        int color = LED_COLORS[random(0, 3)];
+
   if (counter == 1) {
+    // draw pixel at center of echo
 
     matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 3)]);
 
@@ -556,9 +554,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
 
   } else if (counter == 100) {
-    //      matrix->fillCircle(xIndex, yIndex, 3, LED_BLACK);
-    //      xAxisEchoOrigin[echoLookupIndex] += random(-1,1);
-    //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
+
 
     matrix->fillCircle(xIndex, yIndex, 3, LED_COLORS[random(0, 3)]);
     matrix->fillCircle(xIndex, yIndex, 2, LED_COLORS[random(0, 3)]);
@@ -568,16 +564,7 @@ void drawEchoAnimation(int echoLookupIndex) {
   } else if (counter == 500) {
     // Draw echo movement and trail
 
-
-    //      matrix->fillCircle(xIndex, yIndex, 3, LED_BLACK);
-    //      xAxisEchoOrigin[echoLookupIndex] += random(-1,1);
-    //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
-    //      Serial.println("moving x axis");
-    int color = LED_COLORS[random(0, 3)];
     matrix->fillCircle(xIndex, yIndex, 1, color);
-
-
-
 
     usbMIDI.sendNoteOn(61, 100 , 13);
 
@@ -602,17 +589,18 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->drawCircle( xIndex, yIndex, 2, LED_BLACK);
     matrix->drawPixel(xIndex, yIndex, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
+
     usbMIDI.sendNoteOn(61, 10 , echoLookupIndex + 1);
-    int color = LED_COLORS[random(0, 3)];
-    //    if (echoDirectionLookup[echoLookupIndex] == 'y') {
-    //
-    //      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
-    //
-    //    } else {
-    //      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
-    //
-    //
-    //    }
+    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+      Serial.print("in here drawing a line between 0 and :");
+      Serial.println(xIndex);
+
+      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+    } else {
+      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
+
+    }
+
     matrix->show();
 
 
@@ -687,13 +675,8 @@ void clearPixels(int echoLookupIndex) {
     matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
     matrix->drawCircle( xIndex, yIndex, 2, LED_BLACK);
     matrix->drawPixel(xIndex, yIndex, LED_BLACK);
-    if (echoDirectionLookup[echoLookupIndex] == 'y') {
 
-      matrix->drawLine(0, yAxisEchoDefault[echoLookupIndex], xAxisEchoDefault[echoLookupIndex] , yAxisEchoDefault[echoLookupIndex], color);
-    } else {
-      matrix->drawLine(xAxisEchoDefault[echoLookupIndex], yAxisEchoDefault[echoLookupIndex], xAxisEchoDefault[echoLookupIndex] , 17, color);
 
-    }
 
 
 
@@ -701,7 +684,7 @@ void clearPixels(int echoLookupIndex) {
   }
   //
   //
-  //  matrix->show();
+  //    matrix->show();
   //
   //
   //
