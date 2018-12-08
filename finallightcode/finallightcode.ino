@@ -195,9 +195,9 @@ void loop() {
       //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
 
     }
-    Serial.print(" sensor2 : ");
-    //  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
-    Serial.println(sensorValue2);
+    //    Serial.print(" sensor2 : ");
+    //    //  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
+    //    Serial.println(sensorValue2);
 
     if (abs(mappedPotValue3 - previousValue3) > 2) {
       //if (calculateDistance(xAxisEchoOrigin[3],yAxisEchoOrigin[3],xAxisEchoOrigin[3],mappedPotValue3) > 3) {
@@ -443,7 +443,6 @@ void checkForCollisions(int echoLookupIndex) {
 // counter of 500 means in movement
 
 void drawEchoAnimation(int echoLookupIndex) {
-
   int counter = echoCounters[echoLookupIndex];
   int xIndex = xAxisEchoOrigin[echoLookupIndex];
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
@@ -453,7 +452,9 @@ void drawEchoAnimation(int echoLookupIndex) {
 
   }
   if (counter == 1) {
+
     matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 3)]);
+
     echoCounters[echoLookupIndex]++;
     usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
   } else if (counter <= 3 && counter > 1 ) {
@@ -480,25 +481,28 @@ void drawEchoAnimation(int echoLookupIndex) {
     //      yAxisEchoOrigin[echoLookupIndex] += random(-1,1);
     //      Serial.println("moving x axis");
     int color = LED_COLORS[random(0, 3)];
-    //    matrix->drawPixel(xIndex, yIndex+2,color);
     matrix->fillCircle(xIndex, yIndex, 1, color);
 
-    //    if (echoDirectionLookup[echoLookupIndex] == 'y') {
-    //
-    //      matrix->drawPixel(xIndex - 1, yIndex, color);
-    //      matrix->drawPixel(xIndex - 2, yIndex, color);
-    //    } else {
-    //      matrix->drawPixel(xIndex, yIndex - 1, color);
-    //      matrix->drawPixel(xIndex, yIndex - 2, color);
-    //
-    //    }
-    //
+
 
 
     usbMIDI.sendNoteOn(61, 100 , 13);
 
   }
 
+
+//  if (counter < 4) {
+//    int color = LED_COLORS[random(0, 3)];
+//    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+//
+//      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+//
+//    } else {
+//      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
+//
+//
+//    }
+//  }
   if (counter > 3 && counter < 10) {
     //    Serial.println("resetting");
     matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
@@ -506,6 +510,16 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->drawPixel(xIndex, yIndex, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
     usbMIDI.sendNoteOn(61, 10 , echoLookupIndex + 1);
+    int color = LED_COLORS[random(0, 3)];
+    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+
+      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+
+    } else {
+      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
+
+
+    }
     matrix->show();
 
 
@@ -544,8 +558,8 @@ void clearPixels(int echoLookupIndex) {
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
   //
   //if (echoLookupIndex ==1) {
-  //  Serial.println("1");
-  //  Serial.println(counter);
+  Serial.println("in c lear with counter");
+  Serial.println(counter);
   //  Serial.println(xIndex);
   //  Serial.println(yIndex);
   ////  delay(3000);
@@ -572,13 +586,27 @@ void clearPixels(int echoLookupIndex) {
 
     matrix->fillCircle( xIndex, yIndex, 2, LED_BLACK);
 
-
-  } else {
-
-
+    // not sure if this is the right place for this
+  } else if (counter != 0 ) {
+    Serial.println("oh hello");
+    int xIndex = xAxisEchoOrigin[echoLookupIndex];
+    int yIndex = yAxisEchoOrigin[echoLookupIndex];
+    int color = LED_COLORS[random(0, 3)];
     matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
     matrix->drawCircle( xIndex, yIndex, 2, LED_BLACK);
     matrix->drawPixel(xIndex, yIndex, LED_BLACK);
+    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+      Serial.println("iaaaann hereeeeee");
+
+      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+    } else {
+      Serial.println("iaaaann hereeeedddddee");
+      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
+
+    }
+
+
+
     echoCounters[echoLookupIndex] = 1;
   }
   //
