@@ -485,7 +485,7 @@ void checkForCollisions(int echoLookupIndex) {
       // register that new collision in absorbed and clear everything
       // set counter to a new number and create a visualization for that
       //    } else if (originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] != 100 && index != collisionLookupMap[index]) {
-//    } else if (originDistance > 1 && originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] == 100 && echoCounters[1] != 100 ) {
+      //    } else if (originDistance > 1 && originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] == 100 && echoCounters[1] != 100 ) {
     } else if (originDistance > 1 && originDistance < 7 && echoCounters[echoLookupIndex] != 100 && echoCounters[relatedLookupIndex] == 100 && echoCounters[index] == 100 ) {
 
       //      Serial.println("3rd collision detected, initiating draw");
@@ -583,7 +583,22 @@ void drawEchoAnimation(int echoLookupIndex) {
   } else if (counter == 500) {
     // Draw echo movement and trail
 
-    matrix->fillCircle(xIndex, yIndex, 1, color);
+    //    matrix->fillCircle(xIndex, yIndex, 1, color);
+    //    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+    //      Serial.print("in here drawing a line between 0 and :");
+    //      Serial.println(xIndex);
+    //
+    //      matrix->x(xIndex - 3, yIndex, xIndex , yIndex, color);
+    //    } else {
+    //      matrix->drawLine(xIndex, yIndex, xIndex , yIndex + 3, color);
+    //
+    //    }
+
+
+
+
+
+
 
     usbMIDI.sendNoteOn(61, 100 , 13);
 
@@ -603,15 +618,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     echoCounters[echoLookupIndex] = 1;
 
     usbMIDI.sendNoteOn(61, 10 , echoLookupIndex + 1);
-    if (echoDirectionLookup[echoLookupIndex] == 'y') {
-      Serial.print("in here drawing a line between 0 and :");
-      Serial.println(xIndex);
 
-      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
-    } else {
-      matrix->drawLine(xIndex, yIndex, xIndex , 17, color);
-
-    }
 
     matrix->show();
 
@@ -672,17 +679,18 @@ void clearPixels(int echoLookupIndex) {
   } else if (counter == 500) {
 
     matrix->fillCircle( xIndex, yIndex, 2, LED_BLACK);
+    if (echoDirectionLookup[echoLookupIndex] == 'y') {
+      matrix->drawLine(xIndex - 4, yIndex, xIndex , yIndex, LED_BLACK);
+    } else {
+      matrix->drawLine(xIndex, yIndex, xIndex , yIndex + 4, LED_BLACK);
+
+    }
+
 
     // not sure if this is the right place for this
   } else if (counter == 200) {
     matrix->fillCircle(xIndex, yIndex, 4, LED_BLACK);
 
-    if (echoDirectionLookup[echoLookupIndex] == 'y') {
-      matrix->drawLine(0, yIndex, xIndex , yIndex, LED_BLACK);
-    } else {
-      matrix->drawLine(xIndex, yIndex, xIndex , 17, LED_BLACK);
-
-    }
 
 
 
@@ -729,7 +737,8 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
       int xIndex = xAxisEchoOrigin[echoIndex];
       int yIndex = yAxisEchoOrigin[echoIndex];
       int color = LED_COLORS[random(0, 3)];
-      matrix->drawLine(0, yIndex, xIndex , yIndex, color);
+      matrix->drawLine(0, yIndex, xIndex , yIndex, LED_BLACK);
+      matrix->drawLine(xIndex - 4, yIndex, xIndex , yIndex, color);
       matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
       //If you want a trail of echo comment this function call out
       //    clearPixels(echoIndex);
@@ -762,7 +771,10 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
       int xIndex = xAxisEchoOrigin[echoIndex];
       int yIndex = yAxisEchoOrigin[echoIndex];
       int color = LED_COLORS[random(0, 3)];
-      matrix->drawLine(xIndex, yIndex, xIndex , 14, color);
+      matrix->drawLine(xIndex, yIndex, xIndex , 17, LED_BLACK);
+
+      matrix->drawLine(xIndex, yIndex, xIndex , yIndex + 4, color);
+
       matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, color);
       //If you want a trail of echo comment this function call out
       //          clearPixels(echoIndex);
@@ -790,23 +802,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
     }
 
-    //  } else if (yAxisEchoOrigin[echoIndex] > 0){
-    //    yAxisEchoOrigin[echoIndex] -= 1;
-    //    //      Serial.println(yAxisEchoOrigin[echoIndex]);
-    //    if (yAxisEchoOrigin[echoIndex] <= mappedPotValue  ) {
-    //      echoInMovement[echoIndex] = false;
-    //      Serial.println("done with echo movement across board on y axis");
-    //
-    //
-    //      clearPixels(echoIndex);
-    //         echoCounters[echoIndex] = 1;
-    //
-    //
-    //    }
-    //
-    //
-    //  }
-    //    clearPixels(echoIndex);
+
   }
 
 }
