@@ -485,7 +485,9 @@ void checkForCollisions(int echoLookupIndex) {
       // register that new collision in absorbed and clear everything
       // set counter to a new number and create a visualization for that
       //    } else if (originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] != 100 && index != collisionLookupMap[index]) {
-    } else if (originDistance > 1 && originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] == 100 && echoCounters[1] != 100 ) {
+//    } else if (originDistance > 1 && originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] == 100 && echoCounters[1] != 100 ) {
+    } else if (originDistance > 1 && originDistance < 7 && echoCounters[echoLookupIndex] != 100 && echoCounters[relatedLookupIndex] == 100 && echoCounters[index] == 100 ) {
+
       //      Serial.println("3rd collision detected, initiating draw");
 
       //      // Set all the 3 collisions to the center
