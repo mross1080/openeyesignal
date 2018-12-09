@@ -388,7 +388,7 @@ int calculateDistance(int xIndex1, int yIndex1, int xIndex2, int yIndex2) {
 }
 
 void checkForCollisions(int echoLookupIndex) {
-//    Serial.println("!-----------------------------!");
+  //    Serial.println("!-----------------------------!");
 
   int checkStartIndex;
   int checkEndIndex;
@@ -431,7 +431,7 @@ void checkForCollisions(int echoLookupIndex) {
 
 
     // find distance between origin of echoes
-int relatedLookupIndex = collisionLookupMap[index];
+    int relatedLookupIndex = collisionLookupMap[index];
     double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
     Serial.println("----------------------------- ");
 
@@ -466,7 +466,7 @@ int relatedLookupIndex = collisionLookupMap[index];
     Serial.println(echoCounters[relatedLookupIndex]);
     Serial.print("1 counter ");
     Serial.println(echoCounters[index]);
-Serial.println("----------------------------- ");
+    Serial.println("----------------------------- ");
 
     if (originDistance < 5 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  && echoCounters[index] != 100 && echoCounters[echoLookupIndex] != 200  && echoCounters[index] != 200 ) {
 
@@ -486,21 +486,22 @@ Serial.println("----------------------------- ");
       // set counter to a new number and create a visualization for that
       //    } else if (originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] != 100 && index != collisionLookupMap[index]) {
     } else if (originDistance > 1 && originDistance < 7 && echoCounters[0] == 100 && echoCounters[2] == 100 && echoCounters[1] != 100 ) {
-//      Serial.println("3rd collision detected, initiating draw");
+      //      Serial.println("3rd collision detected, initiating draw");
 
-//      // Set all the 3 collisions to the center
+      //      // Set all the 3 collisions to the center
       echoCounters[echoLookupIndex] = 200;
       echoCounters[index] = 200;
       echoCounters[collisionLookupMap[index]] = 200;
+      clearPixels(echoLookupIndex);
+      clearPixels(index);
+      clearPixels(collisionLookupMap[index]);
       xAxisEchoOrigin[echoLookupIndex] = midpointX;
       yAxisEchoOrigin[echoLookupIndex] = midpointY;
       xAxisEchoOrigin[index] = midpointX;
       yAxisEchoOrigin[index] = midpointY;
       xAxisEchoOrigin[collisionLookupMap[index]] = midpointX;
       yAxisEchoOrigin[collisionLookupMap[index]] = midpointY;
-      clearPixels(echoLookupIndex);
-      clearPixels(index);
-      clearPixels(collisionLookupMap[index]);
+
 
 
 
@@ -508,7 +509,7 @@ Serial.println("----------------------------- ");
     }
 
   }
-//  Serial.println("!-----------------------------!");
+  //  Serial.println("!-----------------------------!");
 
 }
 
@@ -579,7 +580,7 @@ void drawEchoAnimation(int echoLookupIndex) {
 
   } else if (counter == 500) {
     // Draw echo movement and trail
-    
+
     matrix->fillCircle(xIndex, yIndex, 1, color);
 
     usbMIDI.sendNoteOn(61, 100 , 13);
