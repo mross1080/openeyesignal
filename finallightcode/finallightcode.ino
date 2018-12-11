@@ -119,6 +119,8 @@ int pixelsInEcho[5][49];
 char echoDirectionLookup[5];
 long echoPreviousMillisTracker[5];
 int echoPreviousPotValueTracker[5];
+int currentPotValues[5];
+
 bool echoInMovement[5];
 int absorbedEchoLookup[5];
 
@@ -148,24 +150,35 @@ void loop() {
 
   int  sensorValue0 =  analogRead(A0);
   int mappedPotValue0 = map(sensorValue0, 0, 1023, 0, 47);
+  currentPotValues[0] = mappedPotValue0;
   //
   //
   int  sensorValue1 =  analogRead(A1);
   int mappedPotValue1 = map(sensorValue1, 0, 1023, 0, 47);
+  currentPotValues[1] = mappedPotValue1;
+
   int  sensorValue2 = analogRead(A3);
   int mappedPotValue2 = map(sensorValue2, 0, 1023, 13, 0);
+  currentPotValues[2] = mappedPotValue2;
+
   int  sensorValue3 = analogRead(A4);
   int mappedPotValue3 = map(sensorValue3, 0, 720, 13, 2);
+  currentPotValues[3] = mappedPotValue3;
+
 
   int  sensorValue4 = analogRead(A5);
   int mappedPotValue4 = map(sensorValue4, 0, 1023, 13, 0);
-//    Serial.println("n pot value 4 ");
-//    Serial.print(mappedPotValue4);
+  currentPotValues[4] = mappedPotValue4;
+
+  //    Serial.println("n pot value 4 ");
+  //    Serial.print(mappedPotValue4);
   movementTimeDelta = currentMillis - previousMovementTime;
   //
   if (movementTimeDelta > 250) {
 
     // draw 3rd col
+    Serial.print(" currnet pot value 4 : ");
+    Serial.println(currentPotValues[4]);
     Serial.print(" counter 0 : ");
     Serial.println(echoCounters[0]);
     Serial.print(" counter 1 : ");
@@ -177,91 +190,120 @@ void loop() {
     Serial.print(" counter  4 : ");
     Serial.println(echoCounters[4]);
     Serial.println("yAxisEchoOrigin 4 : ");
-   Serial.println(yAxisEchoOrigin[4]);
+    Serial.println(yAxisEchoOrigin[4]);
     Serial.print(" prev value  4 : ");
     Serial.println( echoPreviousPotValueTracker[4]);
 
 
-    if (abs(mappedPotValue0 - echoPreviousPotValueTracker[0]) > 1) {
-      //    Serial.println("changed in pot value 0 moving");
-      //    Serial.print(mappedPotValue0);
-      //    Serial.println("old value of pot : ");
-      //    Serial.print(previousValue0);
-      clearPixels(0);
-      resetWallCollision(0);
-      echoCounters[0] = 500;
-      yAxisEchoOrigin[0] = yAxisEchoDefault[0];
-      // xAxisEchoOrigin[collisionLookupMap[0]] = xAxisEchoDefault[collisionLookupMap[0]];
+    // for each echo check if the potentiometer has moved
+    for (int echoLookupIndex = 0; echoLookupIndex < NUM_ECHOES; echoLookupIndex++) {
 
-      echoPreviousPotValueTracker[0] = mappedPotValue0;
-      usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
+//      Serial.print(" index  : ");
+//      Serial.println( echoLookupIndex );
+//      Serial.print(" comparing  : ");
+//      Serial.println( currentPotValues[echoLookupIndex] );
+//      Serial.print(" with  : ");
+//      Serial.println( echoPreviousPotValueTracker[echoLookupIndex] );
+      // if there has been a change in pot value
+      if (currentPotValues[echoLookupIndex] != echoPreviousPotValueTracker[echoLookupIndex]) {
+        if (echoDirectionLookup[echoLookupIndex] == 'y') {
+          clearPixels(echoLookupIndex);
+          resetWallCollision(echoLookupIndex);
+          echoCounters[echoLookupIndex] = 500;
+          yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
+        } else {
+          clearPixels(echoLookupIndex);
+          resetWallCollision(echoLookupIndex);
 
-    }
+          echoCounters[echoLookupIndex] = 500;
+          echoPreviousPotValueTracker[echoLookupIndex] = mappedPotValue2;
+        }
 
-    if (abs(mappedPotValue1 - echoPreviousPotValueTracker[1]) > 2 ) {
-
-      clearPixels(1);
-            resetWallCollision(1);
-
-      echoCounters[1] = 500;
-
-      echoPreviousPotValueTracker[1] = mappedPotValue1;
-      yAxisEchoOrigin[1] = yAxisEchoDefault[1];
-      //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
-
-
+        echoPreviousPotValueTracker[echoLookupIndex] = currentPotValues[echoLookupIndex];
+      }
 
     }
 
-
-
-    if (abs(mappedPotValue2 - echoPreviousPotValueTracker[2]) > 2) {
-
-
-      Serial.println("changed in pot value");
-      clearPixels(2);
-            resetWallCollision(2);
-
-      echoCounters[2] = 500;
-      echoPreviousPotValueTracker[2] = mappedPotValue2;
-      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
-
-
-    }
-    //    Serial.print(" sensor2 : ");
-    //    //  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
-    //    Serial.println(sensorValue2);
-
-    if (abs(mappedPotValue3 - echoPreviousPotValueTracker[3]) > 2) {
-
-      clearPixels(3);
-      echoCounters[3] = 500;
-            resetWallCollision(3);
-
-      echoPreviousPotValueTracker[3] = mappedPotValue3;
-
-      xAxisEchoOrigin[3] = xAxisEchoDefault[3];
-      yAxisEchoOrigin[collisionLookupMap[3]] = yAxisEchoDefault[collisionLookupMap[3]];
-      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
-
-
-    }
-
-//    if (abs(mappedPotValue4 - echoPreviousPotValueTracker[4]) > 2) {
-          if (mappedPotValue4 != echoPreviousPotValueTracker[4]) {
-      Serial.println("changed in pot value!!!!!!!!!!!!!!");
-
-      Serial.println("changed in pot value");
-      clearPixels(4);
-            resetWallCollision(4);
-
-      echoCounters[4] = 500;
-      echoPreviousPotValueTracker[4] = mappedPotValue4;
-      //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
-
-
-    }
-
+    //      if (abs(mappedPotValue0 - echoPreviousPotValueTracker[0]) > 1) {
+    //        //    Serial.println("changed in pot value 0 moving");
+    //        //    Serial.print(mappedPotValue0);
+    //        //    Serial.println("old value of pot : ");
+    //        //    Serial.print(previousValue0);
+    //        clearPixels(0);
+    //        resetWallCollision(0);
+    //        echoCounters[0] = 500;
+    //        yAxisEchoOrigin[0] = yAxisEchoDefault[0];
+    //        // xAxisEchoOrigin[collisionLookupMap[0]] = xAxisEchoDefault[collisionLookupMap[0]];
+    //
+    //        echoPreviousPotValueTracker[0] = mappedPotValue0;
+    //        usbMIDI.sendControlChange(1, map(sensorValue0, 0, 1023, 0, 100), 11);
+    //
+    //      }
+    //
+    //      if (abs(mappedPotValue1 - echoPreviousPotValueTracker[1]) > 2 ) {
+    //
+    //        clearPixels(1);
+    //        resetWallCollision(1);
+    //
+    //        echoCounters[1] = 500;
+    //
+    //        echoPreviousPotValueTracker[1] = mappedPotValue1;
+    //        yAxisEchoOrigin[1] = yAxisEchoDefault[1];
+    //        //    usbMIDI.sendControlChange(3, map(sensorValue0, 0, 1023, 0, 100), 12);
+    //
+    //
+    //
+    //      }
+    //
+    //
+    //
+    //      if (abs(mappedPotValue2 - echoPreviousPotValueTracker[2]) > 2) {
+    //
+    //
+    //        Serial.println("changed in pot value");
+    //        clearPixels(2);
+    //        resetWallCollision(2);
+    //
+    //        echoCounters[2] = 500;
+    //        echoPreviousPotValueTracker[2] = mappedPotValue2;
+    //        //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+    //
+    //
+    //      }
+    //      //    Serial.print(" sensor2 : ");
+    //      //    //  Serial.println(calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue3));
+    //      //    Serial.println(sensorValue2);
+    //
+    //      if (abs(mappedPotValue3 - echoPreviousPotValueTracker[3]) > 2) {
+    //
+    //        clearPixels(3);
+    //        echoCounters[3] = 500;
+    //        resetWallCollision(3);
+    //
+    //        echoPreviousPotValueTracker[3] = mappedPotValue3;
+    //
+    //        xAxisEchoOrigin[3] = xAxisEchoDefault[3];
+    //        yAxisEchoOrigin[collisionLookupMap[3]] = yAxisEchoDefault[collisionLookupMap[3]];
+    //        //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+    //
+    //
+    //      }
+    //
+    //      //    if (abs(mappedPotValue4 - echoPreviousPotValueTracker[4]) > 2) {
+    //      if (mappedPotValue4 != echoPreviousPotValueTracker[4]) {
+    //        Serial.println("changed in pot value!!!!!!!!!!!!!!");
+    //
+    //        Serial.println("changed in pot value");
+    //        clearPixels(4);
+    //        resetWallCollision(4);
+    //
+    //        echoCounters[4] = 500;
+    //        echoPreviousPotValueTracker[4] = mappedPotValue4;
+    //        //    usbMIDI.sendControlChange(2, map(sensorValue0, 0, 1023, 0, 100), 11);
+    //
+    //
+    //      }
+    //
 
     if (xAxisEchoOrigin[0] != echoPreviousPotValueTracker[0]) {
       matrix->fillCircle( xAxisEchoOrigin[0], yAxisEchoOrigin[0], 1, LED_BLACK);
@@ -278,7 +320,7 @@ void loop() {
 
     }
 
-    
+
 
     //    if (abs(xAxisEchoOrigin[1] - previousValue1) > 2) {
     if (xAxisEchoOrigin[1] != echoPreviousPotValueTracker[1]) {
@@ -401,31 +443,31 @@ void loop() {
 }
 
 void resetWallCollision(int echoLookupIndex) {
-  // THIS IS A HACK AND WILL ONLY ALLOW FOR ONE 3RD COLLISION, NEEDS TO BE FIXED AT SOME POINT 
-//   Serial.println("WALL WALL WALL WALL WALL");
-//   Serial.println(echoLookupIndex);
-//   Serial.println(echoCounters[echoLookupIndex]);
+  // THIS IS A HACK AND WILL ONLY ALLOW FOR ONE 3RD COLLISION, NEEDS TO BE FIXED AT SOME POINT
+  //   Serial.println("WALL WALL WALL WALL WALL");
+  //   Serial.println(echoLookupIndex);
+  //   Serial.println(echoCounters[echoLookupIndex]);
 
-//  int  index = collisionLookupMap[echoLookupIndex];
-  
-        for (int index = 0; index < 4; index++) {
-          if (echoCounters[index] == 200) {
-    
-            echoCounters[index] = 1;
-          }
-    
-        }
+  //  int  index = collisionLookupMap[echoLookupIndex];
+
+  for (int index = 0; index < 4; index++) {
+    if (echoCounters[index] == 200) {
+
+      echoCounters[index] = 1;
+    }
+
+  }
   //      if (echoCounters[echoLookupIndex] == 200 || echoCounters[index] == 200 ||  echoCounters[collisionLookupMap[index]] == 200)
-//  if (echoCounters[echoLookupIndex] == 200 ) {
-//
-//    Serial.println("broken the wall changing these 3 ");
-//    Serial.println(echoLookupIndex);
-//      Serial.println(index);
-//        Serial.println(collisionLookupMap[index]);
-//    echoCounters[echoLookupIndex] = 1;
-//    echoCounters[index] = 1;
-//    echoCounters[collisionLookupMap[index]] = 1;
-//  }
+  //  if (echoCounters[echoLookupIndex] == 200 ) {
+  //
+  //    Serial.println("broken the wall changing these 3 ");
+  //    Serial.println(echoLookupIndex);
+  //      Serial.println(index);
+  //        Serial.println(collisionLookupMap[index]);
+  //    echoCounters[echoLookupIndex] = 1;
+  //    echoCounters[index] = 1;
+  //    echoCounters[collisionLookupMap[index]] = 1;
+  //  }
 
 }
 
@@ -468,30 +510,30 @@ void checkForCollisions(int echoLaookupIndex) {
       // find distance between origin of echoes
       int relatedLookupIndex = collisionLookupMap[index];
       double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
-//      Serial.println("----------------------------- ");
-//
-//      Serial.print("index : ");
-//      Serial.print(echoLookupIndex);
-//      Serial.print(" x : ");
-//      Serial.print(xIndex);
-//      Serial.print(" y : ");
-//      Serial.println(xIndex);
-//      Serial.print(" counter : ");
-//      Serial.println(echoCounters[echoLookupIndex]);
-//
-//
-//
-//
-//      Serial.print(" index2 (from for loop): ");
-//      Serial.print(index);
-//      Serial.print(" x2: ");
-//      Serial.print(xAxisEchoOrigin[index]);
-//      Serial.print(" y2 : ");
-//      Serial.println(yAxisEchoOrigin[index]);
-//      Serial.print(" distance between ");
-//      Serial.println(originDistance);
-//      Serial.print(" counter : ");
-//      Serial.println(echoCounters[index]);
+      //      Serial.println("----------------------------- ");
+      //
+      //      Serial.print("index : ");
+      //      Serial.print(echoLookupIndex);
+      //      Serial.print(" x : ");
+      //      Serial.print(xIndex);
+      //      Serial.print(" y : ");
+      //      Serial.println(xIndex);
+      //      Serial.print(" counter : ");
+      //      Serial.println(echoCounters[echoLookupIndex]);
+      //
+      //
+      //
+      //
+      //      Serial.print(" index2 (from for loop): ");
+      //      Serial.print(index);
+      //      Serial.print(" x2: ");
+      //      Serial.print(xAxisEchoOrigin[index]);
+      //      Serial.print(" y2 : ");
+      //      Serial.println(yAxisEchoOrigin[index]);
+      //      Serial.print(" distance between ");
+      //      Serial.println(originDistance);
+      //      Serial.print(" counter : ");
+      //      Serial.println(echoCounters[index]);
       int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
       int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
 
@@ -501,15 +543,15 @@ void checkForCollisions(int echoLaookupIndex) {
       // we want to check for echo 1
       //  so 0 and 2 should equal 200
       // 1 should be less than 3
-//      Serial.println("Related collision index ");
-//      Serial.println(relatedLookupIndex);
-//      Serial.print("0 counter  ");
-//      Serial.println(echoCounters[echoLookupIndex]);
-//      Serial.print("2 counter  ");
-//      Serial.println(echoCounters[relatedLookupIndex]);
-//      Serial.print("1 counter ");
-//      Serial.println(echoCounters[index]);
-//      Serial.println("----------------------------- ");
+      //      Serial.println("Related collision index ");
+      //      Serial.println(relatedLookupIndex);
+      //      Serial.print("0 counter  ");
+      //      Serial.println(echoCounters[echoLookupIndex]);
+      //      Serial.print("2 counter  ");
+      //      Serial.println(echoCounters[relatedLookupIndex]);
+      //      Serial.print("1 counter ");
+      //      Serial.println(echoCounters[index]);
+      //      Serial.println("----------------------------- ");
 
       //      if (originDistance < 5 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  &&
       //          echoCounters[index] != 100 && echoCounters[echoLookupIndex] != 200  && echoCounters[index] != 200 ) {
@@ -748,21 +790,21 @@ void clearPixels(int echoLookupIndex) {
     // clear normal echo animation sequence
     int xIndex = xAxisEchoOrigin[echoLookupIndex];
     int yIndex = yAxisEchoOrigin[echoLookupIndex];
-//    matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
+    //    matrix->drawCircle(xIndex, yIndex, 1, LED_BLACK);
     matrix->fillCircle( xIndex, yIndex, 3, LED_BLACK);
-//    matrix->drawPixel(xIndex, yIndex, LED_BLACK);
+    //    matrix->drawPixel(xIndex, yIndex, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
   }
 
   usbMIDI.sendNoteOff(61, 0, echoLookupIndex + 1); // 60 = C4
-    Serial.println("done clearing pixels");
+  Serial.println("done clearing pixels");
 
 }
 void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
-    Serial.println("in draw echo movement");
+  Serial.println("in draw echo movement");
 
   // only draw movement if we're not in a collision
-//  if (echoCounters[echoIndex] != 100 && echoCounters[echoIndex] != 200 && ) {
+  //  if (echoCounters[echoIndex] != 100 && echoCounters[echoIndex] != 200 && ) {
   if (echoCounters[echoIndex] == 500 ) {
 
     Serial.println("in draw echo movement2222");
@@ -808,7 +850,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
 
       if (yAxisEchoOrigin[echoIndex] < mappedPotValue) {
-            Serial.println("moving echo down y axis");
+        Serial.println("moving echo down y axis");
 
         //move echo down the screen
         matrix->drawLine(xIndex, 0, xIndex , yIndex - 4, LED_BLACK);
@@ -820,7 +862,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
       } else {
         // move echo up the screen
-                    Serial.println("moving echo up y axis");
+        Serial.println("moving echo up y axis");
 
         matrix->drawLine(xIndex, 13, xIndex , yIndex + 3, LED_BLACK);
 
@@ -841,12 +883,12 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
       //      }
       //
       int distance = calculateDistance(xAxisEchoOrigin[3], yAxisEchoOrigin[3], xAxisEchoOrigin[3], mappedPotValue);
-//      if (abs(yAxisEchoOrigin[echoIndex] - mappedPotValue) < 2) {
+      //      if (abs(yAxisEchoOrigin[echoIndex] - mappedPotValue) < 2) {
       if (yAxisEchoOrigin[echoIndex] == mappedPotValue) {
 
         echoInMovement[echoIndex] = false;
         Serial.println("done with echo movement across board on y axis" );
-             Serial.println("AHHHHHHHHHHHHHHHHHHH");
+        Serial.println("AHHHHHHHHHHHHHHHHHHH");
 
         matrix->drawLine(xIndex, 0, xIndex , 14, LED_BLACK);
 
