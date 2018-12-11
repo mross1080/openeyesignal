@@ -393,15 +393,31 @@ void loop() {
 }
 
 void resetWallCollision(int echoLookupIndex) {
+  // THIS IS A HACK AND WILL ONLY ALLOW FOR ONE 3RD COLLISION, NEEDS TO BE FIXED AT SOME POINT 
+   Serial.println("WALL WALL WALL WALL WALL");
+   Serial.println(echoLookupIndex);
+   Serial.println(echoCounters[echoLookupIndex]);
 
-
-  int  index = collisionLookupMap[echoLookupIndex];
+//  int  index = collisionLookupMap[echoLookupIndex];
+  
+        for (int index = 0; index < 4; index++) {
+          if (echoCounters[index] == 200) {
+    
+            echoCounters[index] = 1;
+          }
+    
+        }
   //      if (echoCounters[echoLookupIndex] == 200 || echoCounters[index] == 200 ||  echoCounters[collisionLookupMap[index]] == 200)
-  if (echoCounters[echoLookupIndex] == 200 ) {
-    echoCounters[echoLookupIndex] = 1;
-    echoCounters[index] = 1;
-    echoCounters[collisionLookupMap[index]] = 1;
-  }
+//  if (echoCounters[echoLookupIndex] == 200 ) {
+//
+//    Serial.println("broken the wall changing these 3 ");
+//    Serial.println(echoLookupIndex);
+//      Serial.println(index);
+//        Serial.println(collisionLookupMap[index]);
+//    echoCounters[echoLookupIndex] = 1;
+//    echoCounters[index] = 1;
+//    echoCounters[collisionLookupMap[index]] = 1;
+//  }
 
 }
 
