@@ -59,7 +59,7 @@
 //CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
 //const int LED_COLORS[4] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM};
-const int LED_COLORS[4] = {LED_WHITE_LOW, LED_CYAN_LOW, LED_PURPLE_LOW, LED_BLUE_LOW};
+const int LED_COLORS[6] = {LED_WHITE_LOW, LED_CYAN_LOW, LED_PURPLE_LOW, LED_BLUE_LOW,LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
 
 const uint8_t kMatrixWidth = 50;
 const uint8_t kMatrixHeight = 14;
@@ -634,19 +634,19 @@ void drawEchoAnimation(int echoLookupIndex) {
     echoCounters[echoLookupIndex] = counter;
 
   }
-  int color = LED_COLORS[random(0, 3)];
+  int color = LED_COLORS[echoLookupIndex];
 
   if (counter == 1) {
     // draw pixel at center of echo
 
-    matrix->drawPixel(xIndex, yIndex, LED_COLORS[random(0, 3)]);
+    matrix->drawPixel(xIndex, yIndex, LED_COLORS[echoLookupIndex]);
     //    matrix->drawLine(xIndex, yIndex, xIndex+3, yIndex-3,LED_COLORS[random(0, 3)]);
 
     echoCounters[echoLookupIndex]++;
     usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
   } else if (counter <= 3 && counter > 1 ) {
     Serial.println("here i am turning this old thing on");
-    matrix->drawCircle(xIndex, yIndex, counter, LED_COLORS[random(0, 3)]);
+    matrix->drawCircle(xIndex, yIndex, counter, LED_COLORS[echoLookupIndex]);
     echoCounters[echoLookupIndex]++;
     usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
 
@@ -655,8 +655,8 @@ void drawEchoAnimation(int echoLookupIndex) {
     Serial.println(echoLookupIndex);
     Serial.println("filling it up !");
 
-    matrix->fillCircle(xIndex, yIndex, 4, LED_COLORS[random(0, 3)]);
-    matrix->fillCircle(xIndex, yIndex, 3, LED_COLORS[random(0, 3)]);
+    matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_MEDIUM);
+    matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_MEDIUM);
 
     usbMIDI.sendNoteOn(61, 100 , 11);
 
@@ -668,7 +668,7 @@ void drawEchoAnimation(int echoLookupIndex) {
   } else if (counter == 200) {
     // collision 2
     clearPixels(echoLookupIndex);
-    int color = LED_COLORS[random(0, 3)];
+    int color = LED_GREEN_MEDIUM;
     //    matrix->fillCircle(xIndex, yIndex, 2, LED_COLORS[random(0, 3)]);
     matrix->fillRect(xIndex - 4, 0, 10, 14, LED_BLACK);
     //fillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
@@ -795,7 +795,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
     if (echoDirectionLookup[echoIndex] == 'y' ) {
       int xIndex = xAxisEchoOrigin[echoIndex];
       int yIndex = yAxisEchoOrigin[echoIndex];
-      int color = LED_COLORS[random(0, 3)];
+      int color = LED_COLORS[echoIndex];
 
       // if we're moving towards the right side
       if (xAxisEchoOrigin[echoIndex] < desiredAxisValue[echoIndex]) {
@@ -813,7 +813,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
 
       //      matrix->drawLine(0, yIndex, xIndex , yIndex, LED_BLACK);
       //      Serial.println("making circles happen1");
-      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
+      matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[echoIndex]);
       if (abs(xAxisEchoOrigin[echoIndex] - desiredAxisValue[echoIndex]) < 3) {
         echoInMovement[echoIndex] = false;
         matrix->drawLine(0, yIndex, xIndex + 4 , yIndex, LED_BLACK);
@@ -827,7 +827,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
     }
 
     if (echoDirectionLookup[echoIndex] == 'x') {
-      int color = LED_COLORS[random(0, 3)];
+      int color = LED_COLORS[echoIndex];
       int xIndex = xAxisEchoOrigin[echoIndex];
       int yIndex = yAxisEchoOrigin[echoIndex];
 
