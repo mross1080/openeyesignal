@@ -561,15 +561,15 @@ void checkForCollisions(int echoLookupIndex) {
       } else if (originDistance > 1 && originDistance < 9 && echoCounters[echoLookupIndex] != 100 && echoCounters[relatedLookupIndex] == 100 && echoCounters[index] == 100 ) {
 
         //      Serial.println("3rd collision detected, initiating draw");
-
+   clearPixels(echoLookupIndex);
+        clearPixels(index);
+        clearPixels(collisionLookupMap[index]);
         //      // Set all the 3 collisions to the center
         echoCounters[echoLookupIndex] = 200;
         echoCounters[index] = 200;
         echoCounters[collisionLookupMap[index]] = 200;
         collisionLookupMap[collisionLookupMap[index]] = echoLookupIndex;
-        clearPixels(echoLookupIndex);
-        clearPixels(index);
-        clearPixels(collisionLookupMap[index]);
+     
         xAxisEchoOrigin[echoLookupIndex] = midpointX;
         yAxisEchoOrigin[echoLookupIndex] = midpointY;
         xAxisEchoOrigin[index] = midpointX;
@@ -647,7 +647,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->fillRect(xIndex - 4, 0, 10, 14, LED_BLACK);
     //fillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
     int start = 3;
-    int triangleYAxisStart = yIndex - 3;
+    int triangleYAxisStart = yIndex - random(0,3);
 
     for (int offset = 0; offset < 4; offset++) {
       matrix->drawLine(xIndex + offset, triangleYAxisStart + offset, (xIndex + 6) - offset , triangleYAxisStart + offset, color);
@@ -700,17 +700,13 @@ void clearPixels(int echoLookupIndex) {
     Serial.println("in clear pixels 100");
 
     matrix->fillCircle(xIndex, yIndex, 4, LED_BLACK);
-    matrix->fillCircle(xIndex - 1, yIndex, 3, LED_BLACK);
-    matrix->fillCircle(xIndex - +1, yIndex, 3, LED_BLACK);
+    matrix->fillCircle(xIndex - 1, yIndex, 4, LED_BLACK);
+    matrix->fillCircle(xIndex - +1, yIndex, 4, LED_BLACK);
 
-    //    matrix->fillCircle(xIndex, yIndex, 3, LED_BLACK);
-    //    matrix->fillCircle(xIndex - 1, yIndex, 3, LED_BLACK);
-    //    matrix->fillCircle(xIndex - +1, yIndex, 3, LED_BLACK);
+ 
     int relatedIndex = collisionLookupMap[echoLookupIndex];
     // not sure about this line
-    //    echoCounters[relatedIndex] = 1;
     matrix->fillCircle(xAxisEchoOrigin[relatedIndex], yAxisEchoOrigin[relatedIndex], 4, LED_BLACK);
-    //    echoCounters[echoLookupIndex] = 1;
     usbMIDI.sendNoteOff(61, 0 , 11);
     usbMIDI.sendNoteOff(61, 0 , 13);
 
@@ -726,18 +722,8 @@ void clearPixels(int echoLookupIndex) {
 
     }
 
-
-    // not sure if this is the right place for this
   } else if (counter == 200) {
-    //    matrix->fillCircle(xIndex, yIndex, 4, LED_BLACK);
 
-    //    for (int echoLookupIndex = 0; echoLookupIndex < 4; echoLookupIndex++) {
-    //      if (echoCounters[echoLookupIndex] == 200) {
-    //
-    ////        echoCounters[echoLookupIndex] = 1;
-    //      }
-    //
-    //    }
     matrix->fillRect(xIndex, 0, 7, 14, LED_BLACK);
 
 
