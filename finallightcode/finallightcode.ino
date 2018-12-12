@@ -198,7 +198,7 @@ void loop() {
   int mappedPotValue4 = map(sensorValue4, 0, 1023, 13, 0);
   currentPotValues[4] = mappedPotValue4;
 
-    int  sensorValue5 = analogRead(A5);
+  int  sensorValue5 = analogRead(A5);
   int mappedPotValue5 = map(sensorValue5, 0, 1023, 13, 0);
   currentPotValues[5] = mappedPotValue5;
 
@@ -376,11 +376,21 @@ void resetWallCollision(int echoLookupIndex) {
 
   for (int index = 0; index < 5; index++) {
     if (echoCounters[index] == 200) {
+      if (echoDirectionLookup[echoLookupIndex] == 'x') {
+        yAxisEchoOrigin[echoLookupIndex] = 13;
 
+
+      } else {
+        xAxisEchoOrigin[echoLookupIndex] = 0;
+
+
+      }
       echoCounters[index] = 1;
     }
 
   }
+
+
 
 
   if (echoCounters[echoLookupIndex] == 100) {
@@ -405,9 +415,9 @@ void resetWallCollision(int echoLookupIndex) {
 
     } else {
       yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
-
       xAxisEchoOrigin[relatedIndex] = xAxisEchoDefault[relatedIndex];
-      xAxisEchoOrigin[relatedIndex] -= 5;
+      // bump x over to the left
+      yAxisEchoOrigin[relatedIndex] -= 5;
 
 
     }
@@ -561,7 +571,7 @@ void checkForCollisions(int echoLookupIndex) {
       } else if (originDistance > 1 && originDistance < 9 && echoCounters[echoLookupIndex] != 100 && echoCounters[relatedLookupIndex] == 100 && echoCounters[index] == 100 ) {
 
         //      Serial.println("3rd collision detected, initiating draw");
-   clearPixels(echoLookupIndex);
+        clearPixels(echoLookupIndex);
         clearPixels(index);
         clearPixels(collisionLookupMap[index]);
         //      // Set all the 3 collisions to the center
@@ -569,7 +579,7 @@ void checkForCollisions(int echoLookupIndex) {
         echoCounters[index] = 200;
         echoCounters[collisionLookupMap[index]] = 200;
         collisionLookupMap[collisionLookupMap[index]] = echoLookupIndex;
-     
+
         xAxisEchoOrigin[echoLookupIndex] = midpointX;
         yAxisEchoOrigin[echoLookupIndex] = midpointY;
         xAxisEchoOrigin[index] = midpointX;
@@ -647,7 +657,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->fillRect(xIndex - 4, 0, 10, 14, LED_BLACK);
     //fillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
     int start = 3;
-    int triangleYAxisStart = yIndex - random(0,3);
+    int triangleYAxisStart = yIndex - random(0, 3);
 
     for (int offset = 0; offset < 4; offset++) {
       matrix->drawLine(xIndex + offset, triangleYAxisStart + offset, (xIndex + 6) - offset , triangleYAxisStart + offset, color);
@@ -703,7 +713,7 @@ void clearPixels(int echoLookupIndex) {
     matrix->fillCircle(xIndex - 1, yIndex, 4, LED_BLACK);
     matrix->fillCircle(xIndex - +1, yIndex, 4, LED_BLACK);
 
- 
+
     int relatedIndex = collisionLookupMap[echoLookupIndex];
     // not sure about this line
     matrix->fillCircle(xAxisEchoOrigin[relatedIndex], yAxisEchoOrigin[relatedIndex], 4, LED_BLACK);
