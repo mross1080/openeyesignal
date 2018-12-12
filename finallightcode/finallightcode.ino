@@ -234,6 +234,15 @@ void loop() {
       //      Serial.println( desiredAxisValue[echoLookupIndex] );
       if (echoDirectionLookup[echoLookupIndex] == 'y') {
         if (abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]) > 2) {
+              Serial.print(" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
+                Serial.print(" index  moved ! : ");
+            Serial.println( echoLookupIndex );
+            Serial.print(" index  : ");
+            Serial.println( echoLookupIndex );
+            Serial.print(" comparing  : ");
+            Serial.println( xAxisEchoOrigin[echoLookupIndex] );
+            Serial.print(" with  : ");
+            Serial.println( desiredAxisValue[echoLookupIndex] );
           Serial.print(" index  moved ! : ");
           Serial.println( echoLookupIndex );
 
@@ -254,24 +263,29 @@ void loop() {
         }
       }
 
-      //      desiredAxisValue[echoLookupIndex] = currentPotValues[echoLookupIndex];
     }
 
-
-    //
-    //  // for each echo check if the movement is complete
+    // for each echo check if the movement is complete
     for (int echoLookupIndex = 0; echoLookupIndex < NUM_ECHOES; echoLookupIndex++) {
       // if there has been a change in pot value
       if (echoDirectionLookup[echoLookupIndex] == 'y') {
 
-        //        Serial.print("abs diff :");
-
-        //        Serial.println(abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]));
+              
         if (abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]) > 1) {
+            Serial.print("abs diff :");
+
+                Serial.println(abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]));
 
           Serial.print("moving echo : ");
 
           Serial.println(echoLookupIndex);
+           Serial.print("checking echo : ");
+
+          Serial.println(echoLookupIndex);
+        Serial.print(" current y axis : ");
+        Serial.print(xAxisEchoOrigin[echoLookupIndex]);
+          Serial.print("moving y axis to : ");
+        Serial.print(desiredAxisValue[echoLookupIndex]);
 
 
           matrix->fillCircle( xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], 1, LED_BLACK);
@@ -279,7 +293,15 @@ void loop() {
         }
 
       } else {
+         
         if (abs(yAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]) > 1) {
+           Serial.print("checking echo : ");
+
+          Serial.println(echoLookupIndex);
+        Serial.print(" current y axis : ");
+        Serial.print(yAxisEchoOrigin[echoLookupIndex]);
+          Serial.print("moving y axis to : ");
+        Serial.print(desiredAxisValue[echoLookupIndex]);
 
           Serial.print("moving echo : ");
 
@@ -294,16 +316,11 @@ void loop() {
     }
     previousMovementTime = currentMillis;
   }
-  //
-
 
   timeDelta = currentMillis - previousMillis;
-  //
-  ////Play first tone
+  
+  ////draw out animation cycle and check for collisions 
   if (timeDelta > 857) {
-
-    //  checkForCollisions(0);
-
     for (int index = 0; index < NUM_ECHOES; index++) {
       drawEchoAnimation(index);
 
@@ -314,63 +331,6 @@ void loop() {
 
     checkForCollisions(0);
   }
-  //Play second tone
-  //  if (timeDelta > 857 * 2  && stageTwo) {
-  //    checkForCollisions(0);
-  //
-  //    for (int index = 0; index < NUM_ECHOES; index++) {
-  //      drawEchoAnimation(index);
-  //
-  //    }
-  //
-  //
-  //    stageTwo = false;
-  //    matrix->show();
-  //
-  //  }
-  //
-  //  //
-  //  //Play third tone
-  //  if (timeDelta > 857 * 3  && stageThree) {
-  //    //      checkForCollisions(0);
-  //
-  //    for (int index = 0; index < NUM_ECHOES; index++) {
-  //      drawEchoAnimation(index);
-  //
-  //    }
-  //    matrix->show();
-  //    stageThree = false;
-  //
-  //
-  //  }
-  //
-  //  //
-  //  //Play clear color and play last tone
-  //  if (timeDelta > 857 * 4  && stageFour) {
-  //    //  checkForCollisions(0);
-  //
-  //    for (int index = 0; index < NUM_ECHOES; index++) {
-  //      drawEchoAnimation(index);
-  //
-  //    }
-  //    matrix->show();
-  //    stageFour = false;
-  //  }
-  //  //  Serial.println("timeDelta before reset ");
-  //  if (currentMillis - previousMillis > 857 * 4 ) {
-  //
-  //    stageOne = true;
-  //    stageTwo = true;
-  //    stageThree = true;
-  //    stageFour = true;
-  //    matrix->show();
-  //    //  checkForCollisions(0);
-  //    //    checkForCollisions(1);
-  //    //    checkForCollisions(3);
-  //    previousMillis = currentMillis;
-  //
-  //  }
-
 
 }
 
@@ -459,59 +419,60 @@ void checkForCollisions(int echoLookupIndex) {
       // find distance between origin of echoes
       int relatedLookupIndex = collisionLookupMap[index];
       double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
-      Serial.println("----------------------------- ");
-      Serial.print(" counter 1 : ");
-      Serial.println(echoCounters[1]);
-      Serial.print(" counter 2 : ");
-      Serial.println(echoCounters[2]);
-
-
-
-
-      Serial.print("index : ");
-      Serial.print(echoLookupIndex);
-      Serial.print(" x : ");
-      Serial.print(xIndex);
-      Serial.print(" y : ");
-      Serial.println(xIndex);
-      Serial.print(" counter : ");
-      Serial.println(echoCounters[echoLookupIndex]);
-
-
-
-
-      Serial.print(" index2 (from for loop): ");
-      Serial.print(index);
-      Serial.print(" x2: ");
-      Serial.print(xAxisEchoOrigin[index]);
-      Serial.print(" y2 : ");
-      Serial.println(yAxisEchoOrigin[index]);
-      Serial.print(" distance between ");
-      Serial.println(originDistance);
-      Serial.print(" counter : ");
-      Serial.println(echoCounters[index]);
-      int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
+            int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
       int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
+//      Serial.println("----------------------------- ");
+//      Serial.print(" counter 1 : ");
+//      Serial.println(echoCounters[1]);
+//      Serial.print(" counter 2 : ");
+//      Serial.println(echoCounters[2]);
+//
+//
+//
+//
+//      Serial.print("index : ");
+//      Serial.print(echoLookupIndex);
+//      Serial.print(" x : ");
+//      Serial.print(xIndex);
+//      Serial.print(" y : ");
+//      Serial.println(xIndex);
+//      Serial.print(" counter : ");
+//      Serial.println(echoCounters[echoLookupIndex]);
+//
+//
+//
+//
+//      Serial.print(" index2 (from for loop): ");
+//      Serial.print(index);
+//      Serial.print(" x2: ");
+//      Serial.print(xAxisEchoOrigin[index]);
+//      Serial.print(" y2 : ");
+//      Serial.println(yAxisEchoOrigin[index]);
+//      Serial.print(" distance between ");
+//      Serial.println(originDistance);
+//      Serial.print(" counter : ");
+//      Serial.println(echoCounters[index]);
 
-      // Example
-      // echo 0 and 2 are in a collision
-      // echocollision lookup for  0 == 2
-      // we want to check for echo 1
-      //  so 0 and 2 should equal 200
-      // 1 should be less than 3
-      Serial.println("Related collision index ");
-      Serial.println(relatedLookupIndex);
-      Serial.print(echoLookupIndex);
-      Serial.print(" counter  ");
-      Serial.println(echoCounters[echoLookupIndex]);
-      Serial.print(relatedLookupIndex);
-
-      Serial.print(" counter  ");
-      Serial.println(echoCounters[relatedLookupIndex]);
-      Serial.print(index);
-      Serial.print(" counter ");
-      Serial.println(echoCounters[index]);
-      Serial.println("---------------------------- - ");
+//
+//      // Example
+//      // echo 0 and 2 are in a collision
+//      // echocollision lookup for  0 == 2
+//      // we want to check for echo 1
+//      //  so 0 and 2 should equal 200
+//      // 1 should be less than 3
+//      Serial.println("Related collision index ");
+//      Serial.println(relatedLookupIndex);
+//      Serial.print(echoLookupIndex);
+//      Serial.print(" counter  ");
+//      Serial.println(echoCounters[echoLookupIndex]);
+//      Serial.print(relatedLookupIndex);
+//
+//      Serial.print(" counter  ");
+//      Serial.println(echoCounters[relatedLookupIndex]);
+//      Serial.print(index);
+//      Serial.print(" counter ");
+//      Serial.println(echoCounters[index]);
+//      Serial.println("---------------------------- - ");
 
 
       if (originDistance < 5 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  &&
@@ -521,10 +482,13 @@ void checkForCollisions(int echoLookupIndex) {
         if (echoDirectionLookup[echoLookupIndex] == 'y' ) {
 
           desiredAxisValue[echoLookupIndex] = midpointX ;
+          
         } else {
           desiredAxisValue[echoLookupIndex] = midpointY ;
 
         }
+         Serial.print(" comparing  : ");
+            Serial.println( desiredAxisValue[echoLookupIndex] );
 
         Serial.println("calling clear pixels from col function");
         clearPixels(index);
@@ -539,6 +503,8 @@ void checkForCollisions(int echoLookupIndex) {
         collisionLookupMap[index] = echoLookupIndex;
         collisionLookupMap[echoLookupIndex] = index;
         matrix->fillCircle(midpointX, midpointY, 3, LED_COLORS[random(0, 3)]);
+                      Serial.print(" ^^^^^^^^^^^^^^ ");
+
 
         // if there is a collision and the distance is less than 6
         // register that new collision in absorbed and clear everything
@@ -690,7 +656,8 @@ void clearPixels(int echoLookupIndex) {
     //    matrix->fillCircle(xIndex - 1, yIndex, 3, LED_BLACK);
     //    matrix->fillCircle(xIndex - +1, yIndex, 3, LED_BLACK);
     int relatedIndex = collisionLookupMap[echoLookupIndex];
-    echoCounters[relatedIndex] = 1;
+    // not sure about this line 
+//    echoCounters[relatedIndex] = 1;
     matrix->fillCircle(xAxisEchoOrigin[relatedIndex], yAxisEchoOrigin[relatedIndex], 3, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
     usbMIDI.sendNoteOff(61, 0 , 11);
@@ -784,11 +751,12 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
       //      matrix->drawLine(0, yIndex, xIndex , yIndex, LED_BLACK);
       Serial.println("making circles happen1");
       matrix->fillCircle(xAxisEchoOrigin[echoIndex], yAxisEchoOrigin[echoIndex], 1, LED_COLORS[random(0, 3)]);
-      if (abs(xAxisEchoOrigin[echoIndex] - desiredAxisValue[echoIndex]) < 2) {
+      if (abs(xAxisEchoOrigin[echoIndex] - desiredAxisValue[echoIndex]) < 3) {
         echoInMovement[echoIndex] = false;
         matrix->drawLine(0, yIndex, xIndex + 4 , yIndex, LED_BLACK);
         clearPixels(echoIndex);
         echoCounters[echoIndex] = 1;
+        xAxisEchoOrigin[echoIndex] = desiredAxisValue[echoIndex];
 
       }
       matrix->show();
