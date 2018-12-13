@@ -59,7 +59,7 @@
 //CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
 //const int LED_COLORS[4] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM};
-const int LED_COLORS[6] = {LED_WHITE_LOW, LED_CYAN_LOW, LED_PURPLE_LOW, LED_BLUE_LOW,LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
+const int LED_COLORS[6] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM, LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
 
 const uint8_t kMatrixWidth = 50;
 const uint8_t kMatrixHeight = 14;
@@ -628,6 +628,17 @@ void drawEchoAnimation(int echoLookupIndex) {
   int counter = echoCounters[echoLookupIndex];
   int xIndex = xAxisEchoOrigin[echoLookupIndex];
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
+  int midiNote = 61;
+  if (echoDirectionLookup[echoLookupIndex] == 'y' ) {
+
+    int midiNote = map (xIndex, 0, 49, 48 ,  71);
+
+  } else {
+    int midiNote = map (yIndex, 0, 13, 48 ,  71);
+
+  }
+
+
   //  checkForCollisions(0);
   if (xIndex < 2 || yIndex > 11) {
     counter = 0;
@@ -643,12 +654,12 @@ void drawEchoAnimation(int echoLookupIndex) {
     //    matrix->drawLine(xIndex, yIndex, xIndex+3, yIndex-3,LED_COLORS[random(0, 3)]);
 
     echoCounters[echoLookupIndex]++;
-    usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
+    usbMIDI.sendNoteOn(midiNote, 155 - counter * 35 , echoLookupIndex + 1);
   } else if (counter <= 3 && counter > 1 ) {
     Serial.println("here i am turning this old thing on");
     matrix->drawCircle(xIndex, yIndex, counter, LED_COLORS[echoLookupIndex]);
     echoCounters[echoLookupIndex]++;
-    usbMIDI.sendNoteOn(61, 155 - counter * 35 , echoLookupIndex + 1);
+    usbMIDI.sendNoteOn(midiNote, 155 - counter * 35 , echoLookupIndex + 1);
 
   } else if (counter == 100) {
     // collision 1
@@ -658,12 +669,12 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_MEDIUM);
     matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_MEDIUM);
 
-    usbMIDI.sendNoteOn(61, 100 , 11);
+    usbMIDI.sendNoteOn(midiNote, 100 , 11);
 
   } else if (counter == 500) {
     // Draw echo movement and trail
 
-    usbMIDI.sendNoteOn(61, 100 , 13);
+    usbMIDI.sendNoteOn(midiNote, 100 , 13);
 
   } else if (counter == 200) {
     // collision 2
@@ -685,6 +696,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->fillRect(xIndex, 0, 7, triangleYAxisStart, color);
     matrix->fillRect(xIndex, triangleYAxisStart + 6, 7, 14 - (triangleYAxisStart + 6), color);
 
+    usbMIDI.sendNoteOn(midiNote                                                                                         , 155 - counter * 35 , 15);
 
 
   }
@@ -696,7 +708,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->drawPixel(xIndex, yIndex, LED_BLACK);
     echoCounters[echoLookupIndex] = 1;
 
-    usbMIDI.sendNoteOn(61, 10 , echoLookupIndex + 1);
+    usbMIDI.sendNoteOn(midiNote, 10 , echoLookupIndex + 1);
 
 
     matrix->show();
@@ -749,6 +761,7 @@ void clearPixels(int echoLookupIndex) {
     }
 
   } else if (counter == 200) {
+    usbMIDI.sendNoteOff(61, 0, 15);
 
     matrix->fillRect(xIndex, 0, 7, 14, LED_BLACK);
 
