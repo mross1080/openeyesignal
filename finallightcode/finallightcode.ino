@@ -58,8 +58,11 @@
 #define NUM_LEDS    700
 //CRGB leds[NUM_LEDS];
 int ledLookup[NUM_LEDS];
-//const int LED_COLORS[4] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM};
-const int LED_COLORS[6] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM, LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
+
+// comment this out for testing/development
+const int LED_COLORS[6] = {LED_WHITE_LOW, LED_CYAN_LOW, LED_PURPLE_LOW, LED_BLUE_LOW, LED_ORANGE_LOW, LED_RED_LOW};
+// comment this out for production
+//const int LED_COLORS[6] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM, LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
 
 const uint8_t kMatrixWidth = 50;
 const uint8_t kMatrixHeight = 14;
@@ -357,18 +360,8 @@ void loop() {
 
   ////draw out animation cycle and check for collisions
   if (timeDelta > 857) {
-    Serial.print("sensor value 0 ");
-    Serial.println(sensorValue0);
-    Serial.print("sensor value 1 ");
-    Serial.println(sensorValue1);
-    Serial.print("sensor value 2 ");
-    Serial.println(sensorValue2);
-    Serial.print("sensor value 3 ");
-    Serial.println(sensorValue3);
-    Serial.print("sensor value 4 ");
-    Serial.println(sensorValue4);
-    Serial.print("sensor value 5 ");
-    Serial.println(sensorValue5);
+    // SOMETHING GOING WRONG WITH SLIDERS? UNCOMMENT THIS TO CHECK THE ANALOG INPUT READINGS
+    //    printSensorValues(sensorValue0,sensorValue1, sensorValue2, sensorValue3, sensorValue4, sensorValue5);
     for (int index = 0; index < NUM_ECHOES; index++) {
       drawEchoAnimation(index);
 
@@ -464,6 +457,23 @@ int calculateDistance(int xIndex1, int yIndex1, int xIndex2, int yIndex2) {
   return sqrt(pow(xIndex2 - xIndex1, 2) + pow(yIndex2 - yIndex1, 2));
 
 
+}
+
+void printSensorValues(int sensorValue0, int sensorValue1, int sensorValue2,
+                       int sensorValue3, int sensorValue4,  int sensorValue5) {
+
+  Serial.print("sensor value 0 ");
+  Serial.println(sensorValue0);
+  Serial.print("sensor value 1 ");
+  Serial.println(sensorValue1);
+  Serial.print("sensor value 2 ");
+  Serial.println(sensorValue2);
+  Serial.print("sensor value 3 ");
+  Serial.println(sensorValue3);
+  Serial.print("sensor value 4 ");
+  Serial.println(sensorValue4);
+  Serial.print("sensor value 5 ");
+  Serial.println(sensorValue5);
 }
 
 void checkForCollisions(int echoLookupIndex) {
@@ -564,6 +574,7 @@ void checkForCollisions(int echoLookupIndex) {
         //        Serial.println( desiredAxisValue[echoLookupIndex] );
         //
         //        Serial.println("calling clear pixels from col function");
+        clearPixels(echoLookupIndex);
         clearPixels(index);
 
         xAxisEchoOrigin[echoLookupIndex] = midpointX;
@@ -752,10 +763,45 @@ void clearPixels(int echoLookupIndex) {
   } else if (counter == 500) {
     //    Serial.println("in clear pixels 500");
 
+
+    // clear the actual circle of the movemnt echo
     matrix->fillCircle( xIndex, yIndex, 2, LED_BLACK);
+
+    // this next part is to clear the trail of the echo,
+    // we need to check which direction it was headed towards in order to do this correctly
     if (echoDirectionLookup[echoLookupIndex] == 'y') {
-      matrix->drawLine(xIndex - 6, yIndex, xIndex , yIndex, LED_BLACK);
+
+      if (xIndex < desiredAxisValue[echoLookupIndex]) {
+
+        matrix->drawLine(xIndex - 5, yIndex, xIndex , yIndex - 4, LED_BLACK);
+
+      } else {
+
+        matrix->drawLine(xIndex +5, yIndex, xIndex , yIndex + 4, LED_BLACK);
+
+      }
+
+//      matrix->drawLine(xIndex - 6, yIndex, xIndex , yIndex, LED_BLACK);
     } else {
+
+      if (yIndex < desiredAxisValue[echoLookupIndex]) {
+
+        matrix->drawLine(xIndex, yIndex, xIndex , yIndex - 4, LED_BLACK);
+
+      } else {
+
+        matrix->drawLine(xIndex, yIndex, xIndex , yIndex + 4, LED_BLACK);
+
+      }
+
+      Serial.println( yIndex + 6);
+
+      Serial.print("desired y value ");
+      Serial.println(desiredAxisValue[echoLookupIndex]);
+
+
+
+      //      desiredAxisValue
       matrix->drawLine(xIndex, yIndex, xIndex , yIndex + 6, LED_BLACK);
 
     }
