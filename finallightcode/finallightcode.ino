@@ -88,7 +88,7 @@ int mappedPotValue3;
 int NUM_ECHOES = 6;
 
 
-int collisionLookupMap[6];
+int collisionLookupMap[6] = {99, 99, 99, 99, 99, 99};
 int offsetLookup[6];
 int echoCounters[6];
 int counters[6];
@@ -213,6 +213,7 @@ void loop() {
   movementTimeDelta = currentMillis - previousMovementTime;
   //
   if (movementTimeDelta > 250) {
+
     //          Serial.println("sensor value 0 ");
     //      Serial.print(sensorValue0);
     //        Serial.println("sensor value 1 ");
@@ -221,16 +222,6 @@ void loop() {
     //    // draw 3rd col
     //    Serial.print(" xAxisEchoOrigin 0 : ");
     //    Serial.println(xAxisEchoOrigin[0]);
-    //    Serial.print(" counter 0 : ");
-    //    Serial.println(echoCounters[0]);
-    //    Serial.print(" counter 1 : ");
-    //    Serial.println(echoCounters[1]);
-    //    Serial.print(" counter 2 : ");
-    //    Serial.println(echoCounters[2]);
-    //    Serial.print(" counter  3 : ");
-    //    Serial.println(echoCounters[3]);
-    //    Serial.print(" counter  4 : ");
-    //    Serial.println(echoCounters[4]);
     //    Serial.println("yAxisEchoOrigin 0 : ");
     //    Serial.println(yAxisEchoOrigin[0]);
     //    Serial.print(" desired x for  0 : ");
@@ -363,6 +354,9 @@ void loop() {
   if (timeDelta > 857) {
     // SOMETHING GOING WRONG WITH SLIDERS? UNCOMMENT THIS TO CHECK THE ANALOG INPUT READINGS
     //    printSensorValues(sensorValue0,sensorValue1, sensorValue2, sensorValue3, sensorValue4, sensorValue5);
+
+    printCounterLevels();
+
     for (int index = 0; index < NUM_ECHOES; index++) {
       drawEchoAnimation(index);
 
@@ -376,6 +370,22 @@ void loop() {
 
 }
 
+void printCounterLevels() {
+
+
+  Serial.print(" counter 0 : ");
+  Serial.println(echoCounters[0]);
+  Serial.print(" counter 1 : ");
+  Serial.println(echoCounters[1]);
+  Serial.print(" counter 2 : ");
+  Serial.println(echoCounters[2]);
+  Serial.print(" counter  3 : ");
+  Serial.println(echoCounters[3]);
+  Serial.print(" counter  4 : ");
+  Serial.println(echoCounters[4]);
+
+}
+
 void resetWallCollision(int echoLookupIndex) {
   // THIS IS A HACK AND WILL ONLY ALLOW FOR ONE 3RD COLLISION, NEEDS TO BE FIXED AT SOME POINT
   //   Serial.println("WALL WALL WALL WALL WALL");
@@ -386,9 +396,9 @@ void resetWallCollision(int echoLookupIndex) {
   int  index = collisionLookupMap[echoLookupIndex];
 
 
+  if (echoCounters[index] == 200) {
 
-  for (int index = 0; index < 5; index++) {
-    if (echoCounters[index] == 200) {
+    for (int index = 0; index < 5; index++) {
       if (echoDirectionLookup[echoLookupIndex] == 'x') {
         yAxisEchoOrigin[echoLookupIndex] = 13;
 
@@ -661,7 +671,7 @@ void drawEchoAnimation(int echoLookupIndex) {
 
 
   //  checkForCollisions(0);
-  if (xIndex < 2 || yIndex > 11) {
+  if ((xIndex < 2 && desiredAxisValue[echoLookupIndex] == 0)  || (yIndex > 11 && desiredAxisValue[echoLookupIndex] == 13)) {
     counter = 0;
     echoCounters[echoLookupIndex] = counter;
 
@@ -786,11 +796,11 @@ void clearPixels(int echoLookupIndex) {
 
       if (xIndex < desiredAxisValue[echoLookupIndex]) {
 
-        matrix->drawLine(xIndex - 5, yIndex, xIndex , yIndex, LED_BLACK);
+        matrix->drawLine(xIndex - 6, yIndex, xIndex , yIndex, LED_BLACK);
 
       } else {
 
-        matrix->drawLine(xIndex + 5, yIndex, xIndex , yIndex , LED_BLACK);
+        matrix->drawLine(xIndex + 6, yIndex, xIndex , yIndex , LED_BLACK);
 
       }
 
