@@ -312,21 +312,21 @@ void loop() {
       // if there has been a change in pot value
 
 
-      if (echoLookupIndex == 3) {
-
-        Serial.print("in movement index  moved ! : ");
-        Serial.println( echoLookupIndex );
-        Serial.print(" index  : ");
-        Serial.println( echoLookupIndex );
-        Serial.print(" comparing  : ");
-        Serial.println( yAxisEchoOrigin[echoLookupIndex] );
-        Serial.print(" with  : ");
-        Serial.println( desiredAxisValue[echoLookupIndex] );
-        previousPotValues[echoLookupIndex] = currentPotValues[echoLookupIndex];
-        Serial.print("current y axis");
-        Serial.println(yAxisEchoOrigin[echoLookupIndex]);
-
-      }
+      //      if (echoLookupIndex == 3) {
+      //
+      //        Serial.print("in movement index  moved ! : ");
+      //        Serial.println( echoLookupIndex );
+      //        Serial.print(" index  : ");
+      //        Serial.println( echoLookupIndex );
+      //        Serial.print(" comparing  : ");
+      //        Serial.println( yAxisEchoOrigin[echoLookupIndex] );
+      //        Serial.print(" with  : ");
+      //        Serial.println( desiredAxisValue[echoLookupIndex] );
+      //        previousPotValues[echoLookupIndex] = currentPotValues[echoLookupIndex];
+      //        Serial.print("current y axis");
+      //        Serial.println(yAxisEchoOrigin[echoLookupIndex]);
+      //
+      //      }
 
       if (echoDirectionLookup[echoLookupIndex] == 'y') {
 
@@ -384,7 +384,7 @@ void loop() {
     // SOMETHING GOING WRONG WITH SLIDERS? UNCOMMENT THIS TO CHECK THE ANALOG INPUT READINGS
     //        printSensorValues(sensorValue0,sensorValue1, sensorValue2, sensorValue3, sensorValue4, sensorValue5);
 
-    //    printCounterLevels();
+    printCounterLevels();
 
     for (int index = 0; index < NUM_ECHOES; index++) {
       drawEchoAnimation(index);
@@ -548,14 +548,14 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
 
 
   for (int echoLookupIndex = 0; echoLookupIndex < 2; echoLookupIndex++) {
-    Serial.println("!-----------------------------!");
-    Serial.println("entered check col function");
-    Serial.print("current millis " );
-    Serial.println(currentMillis);
-    Serial.print("time since pot move on y axis  " );
-    Serial.println(timeSinceCollision[3]);
-    Serial.print("time since pot move on x axis  " );
-    Serial.println( timeSinceCollision[collisionLookupMap[3]]);
+    //    Serial.println("!-----------------------------!");
+    //    Serial.println("entered check col function");
+    //    Serial.print("current millis " );
+    //    Serial.println(currentMillis);
+    //    Serial.print("time since pot move on y axis  " );
+    //    Serial.println(timeSinceCollision[3]);
+    //    Serial.print("time since pot move on x axis  " );
+    //    Serial.println( timeSinceCollision[collisionLookupMap[3]]);
 
     if ((currentMillis - timeSinceCollision[echoLookupIndex])  > 2000 || (currentMillis - timeSinceCollision[collisionLookupMap[echoLookupIndex]])  > 2000) {
       //    if ((currentMillis - timeSinceCollision[echoLookupIndex])  > 2000) {
