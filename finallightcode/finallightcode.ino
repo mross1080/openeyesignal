@@ -103,6 +103,7 @@ long echoPreviousMillisTracker[6];
 int desiredAxisValue[6];
 int previousPotValues[6];
 int currentPotValues[6];
+int previousPlayedNote[20];
 
 
 bool echoInMovement[6];
@@ -297,16 +298,12 @@ void loop() {
 
             Serial.println(echoLookupIndex);
             Serial.print("abs diff :");
-            //
+            
             Serial.println(abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]));
 
-            Serial.print("moving echo : ");
-
-            Serial.println(echoLookupIndex);
-
-            Serial.print(" current y axis : ");
+            Serial.print(" current x axis : ");
             Serial.print(xAxisEchoOrigin[echoLookupIndex]);
-            Serial.print("moving y axis to : ");
+            Serial.print("moving x axis to : ");
             Serial.print(desiredAxisValue[echoLookupIndex]);
           }
 
@@ -449,9 +446,9 @@ void resetWallCollision(int echoLookupIndex) {
     }
 
   } else {
-      Serial.print("no  3rd cols to get rid of ");
-    
-    }
+    Serial.print("no  3rd cols to get rid of ");
+
+  }
 
 
 
@@ -533,34 +530,42 @@ void checkForCollisions(int echoLookupIndex) {
       double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
       int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
       int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
-      Serial.println("----------------------------- ");
-      Serial.print(" counter 1 : ");
-      Serial.println(echoCounters[0]);
-      Serial.print(" counter 2 : ");
-      Serial.println(echoCounters[5]);
-
-      Serial.print("index : ");
-      Serial.print(echoLookupIndex);
-      Serial.print(" x : ");
-      Serial.print(xIndex);
-      Serial.print(" y : ");
-      Serial.println(xIndex);
-      Serial.print(" counter : ");
-      Serial.println(echoCounters[echoLookupIndex]);
-
-
-      //
-      //
-      Serial.print(" index2 (from for loop): ");
-      Serial.print(index);
-      Serial.print(" x2: ");
-      Serial.print(xAxisEchoOrigin[index]);
-      Serial.print(" y2 : ");
-      Serial.println(yAxisEchoOrigin[index]);
-      Serial.print(" distance between ");
-      Serial.println(originDistance);
-      Serial.print(" counter : ");
-      Serial.println(echoCounters[index]);
+//      Serial.println("----------------------------- ");
+//      Serial.print(" counter 1 : ");
+//      Serial.println(echoCounters[0]);
+//      Serial.print(" counter 2 : ");
+//      Serial.println(echoCounters[5]);
+//
+//      Serial.print("index : ");
+//      Serial.print(echoLookupIndex);
+//      Serial.print(" x : ");
+//      Serial.print(xIndex);
+//      Serial.print(" y : ");
+//      Serial.println(xIndex);
+//      Serial.print(" counter : ");
+//      Serial.println(echoCounters[echoLookupIndex]);
+//      Serial.print(" index2 (from for loop): ");
+//      Serial.print(index);
+//      Serial.print(" x2: ");
+//      Serial.print(xAxisEchoOrigin[index]);
+//      Serial.print(" y2 : ");
+//      Serial.println(yAxisEchoOrigin[index]);
+//      Serial.print(" distance between ");
+//      Serial.println(originDistance);
+//      Serial.print(" counter : ");
+//      Serial.println(echoCounters[index]);
+//      Serial.println("Related collision index ");
+//      Serial.println(relatedLookupIndex);
+//      Serial.print(echoLookupIndex);
+//      Serial.print(" counter  ");
+//      Serial.println(echoCounters[echoLookupIndex]);
+//      Serial.print(relatedLookupIndex);
+//      Serial.print(" counter  ");
+//      Serial.println(echoCounters[relatedLookupIndex]);
+//      Serial.print(index);
+//      Serial.print(" counter ");
+//      Serial.println(echoCounters[index]);
+//      Serial.println("---------------------------- - ");
       //
       //      //
       //      // Example
@@ -569,19 +574,7 @@ void checkForCollisions(int echoLookupIndex) {
       //      // we want to check for echo 1
       //      //  so 0 and 2 should equal 200
       //      // 1 should be less than 3
-      Serial.println("Related collision index ");
-      Serial.println(relatedLookupIndex);
-      Serial.print(echoLookupIndex);
-      Serial.print(" counter  ");
-      Serial.println(echoCounters[echoLookupIndex]);
-      Serial.print(relatedLookupIndex);
-      //
-      Serial.print(" counter  ");
-      Serial.println(echoCounters[relatedLookupIndex]);
-      Serial.print(index);
-      Serial.print(" counter ");
-      Serial.println(echoCounters[index]);
-      Serial.println("---------------------------- - ");
+
 
 
       if (originDistance < 6 && echoCounters[echoLookupIndex] != 100 && echoCounters[index] != 0  &&
@@ -682,19 +675,19 @@ void drawEchoAnimation(int echoLookupIndex) {
   int counter = echoCounters[echoLookupIndex];
   int xIndex = xAxisEchoOrigin[echoLookupIndex];
   int yIndex = yAxisEchoOrigin[echoLookupIndex];
-  int midiNote = 61;
+  int midiNote = 0;
   if (echoDirectionLookup[echoLookupIndex] == 'y' ) {
 
-    int midiNote = map (xIndex, 0, 49, 48 ,  71);
+    midiNote = map (xIndex, 0, 49, 48 ,  71);
 
   } else {
-    int midiNote = map (yIndex, 0, 13, 48 ,  71);
+    midiNote = map (yIndex, 0, 13, 48 ,  71);
 
   }
-
-
+  Serial.print("sending note");
+  Serial.println(midiNote);
   //  checkForCollisions(0);
-  if ((xIndex < 2 && desiredAxisValue[echoLookupIndex] == 0)  || (yIndex > 11 && desiredAxisValue[echoLookupIndex] == 13)) {
+  if ((xIndex <= 2 && desiredAxisValue[echoLookupIndex] == 0)  || (yIndex >= 11 && desiredAxisValue[echoLookupIndex] == 13)) {
     counter = 0;
     echoCounters[echoLookupIndex] = counter;
 
@@ -717,8 +710,8 @@ void drawEchoAnimation(int echoLookupIndex) {
 
   } else if (counter == 100) {
     // collision 1
-    //    Serial.println(echoLookupIndex);
-    //    Serial.println("filling it up !");
+        Serial.println(echoLookupIndex);
+        Serial.println("filling it up !");
 
     matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_MEDIUM);
     matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_MEDIUM);
@@ -738,7 +731,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     matrix->fillRect(xIndex - 4, 0, 10, 14, LED_BLACK);
     //fillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
     int start = 3;
-    int triangleYAxisStart = yIndex - random(0, 3);
+    int triangleYAxisStart = yIndex - random(0, 7);
 
     for (int offset = 0; offset < 4; offset++) {
       matrix->drawLine(xIndex + offset, triangleYAxisStart + offset, (xIndex + 6) - offset , triangleYAxisStart + offset, color);
