@@ -523,6 +523,19 @@ void resetWallCollision(int echoLookupIndex) {
     bumpEchoPostCollision(relatedIndex);
     bumpEchoPostCollision(echoLookupIndex);
     bumpEchoPostCollision(collisionLookupMap[relatedIndex]);
+
+
+    echoCounters[relatedIndex] = 500;
+    desiredAxisValue[relatedIndex] = previousPotValues[relatedIndex];
+    timeSinceCollision[relatedIndex] = millis();
+
+
+    echoCounters[collisionLookupMap[relatedIndex]] = 500;
+    desiredAxisValue[collisionLookupMap[relatedIndex]] = previousPotValues[collisionLookupMap[relatedIndex]];
+    timeSinceCollision[collisionLookupMap[relatedIndex]] = millis();
+
+
+
     //    Serial.print("getting rid of all 3rd cols ");
   }
 
