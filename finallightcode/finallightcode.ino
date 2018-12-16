@@ -107,7 +107,7 @@ int previousPlayedNote[20];
 long timeSinceCollision[6] =  {0, 0, 0, 0, 0, 0};
 int lastNotePlayed[10];
 
-
+bool flashState = true;
 bool echoInMovement[6];
 int absorbedEchoLookup[6];
 
@@ -245,6 +245,10 @@ void loop() {
 
     //    // for each echo check if the potentiometer has moved
     for (int echoLookupIndex = 0; echoLookupIndex < NUM_ECHOES; echoLookupIndex++) {
+      //
+      //      if (echoCounters[echoLookupIndex] == 100) {
+      //        runFlashAnimation(echoLookupIndex);
+      //      }
 
 
       // if there has been a change in pot value
@@ -440,6 +444,26 @@ void printCounterLevels() {
 
 
 
+void runFlashAnimation(int echoLookupIndex) {
+  int xIndex = xAxisEchoOrigin[echoLookupIndex];
+  int yIndex = yAxisEchoOrigin[echoLookupIndex];
+  //WIP
+  if (flashState) {
+
+    matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_MEDIUM);
+    matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_LOW);
+    flashState = false;
+  } else {
+    matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_LOW);
+    matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_MEDIUM);
+    flashState = true;
+
+
+  }
+
+
+}
+
 
 void bumpEchoPostCollision(int echoLookupIndex) {
 
@@ -486,7 +510,7 @@ void resetWallCollision(int echoLookupIndex) {
   //  Serial.print("IN resetWallCollision &&&&&&&&&");
 
   int  index = collisionLookupMap[echoLookupIndex];
- int relatedIndex = collisionLookupMap[echoLookupIndex];
+  int relatedIndex = collisionLookupMap[echoLookupIndex];
 
   if (echoCounters[echoLookupIndex] == 200) {
     //    Serial.print("$$$$$$& The related index  is :");
@@ -513,14 +537,14 @@ void resetWallCollision(int echoLookupIndex) {
     timeSinceCollision[collisionLookupMap[echoLookupIndex]] = millis();
     bumpEchoPostCollision(echoLookupIndex);
     int relatedIndex = collisionLookupMap[echoLookupIndex];
-//    previousPotValues[relatedIndex] = currentPotValues[relatedIndex];
- 
-//
+    //    previousPotValues[relatedIndex] = currentPotValues[relatedIndex];
+
+    //
     Serial.print("^^^^^ setting the related index back to this value : ");
     Serial.println(previousPotValues[relatedIndex]);
-     Serial.print("its current value is  : ");
+    Serial.print("its current value is  : ");
     Serial.println(xAxisEchoOrigin[echoLookupIndex] );
-       echoCounters[relatedIndex] = 500;
+    echoCounters[relatedIndex] = 500;
     desiredAxisValue[relatedIndex] = previousPotValues[relatedIndex];
     timeSinceCollision[relatedIndex] = millis();
 
@@ -766,7 +790,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     midiNote = map (xIndex, 0, 49, 48 ,  71);
 
   } else {
-    midiNote = map (yIndex, 0, 13, 48 ,  71);
+    midiNote = map (yIndex, 0, 13, 71 ,  48);
 
   }
   lastNotePlayed[echoLookupIndex] = midiNote;
@@ -924,6 +948,8 @@ void clearPixels(int echoLookupIndex) {
 
     // Clear movement of pixels
   } else if (counter == 500) {
+    usbMIDI.sendNoteOff( lastNotePlayed[echoLookupIndex], 0  , echoLookupIndex + 1);
+
     //    Serial.println("in clear pixels 500");
 
 
@@ -1009,14 +1035,27 @@ void clearPixels(int echoLookupIndex) {
 
 
 void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
-    Serial.print("in draw echo movement with echo number :");
-    Serial.println(echoIndex);
-    Serial.print("counter :");
-    Serial.println(echoCounters[echoIndex]);
+  Serial.print("in draw echo movement with echo number :");
+  Serial.println(echoIndex);
+  Serial.print("counter :");
+  Serial.println(echoCounters[echoIndex]);
 
   // only draw movement if we're not in a collision
   //  if (echoCounters[echoIndex] != 100 && echoCounters[echoIndex] != 200 && ) {
   if (echoCounters[echoIndex] == 500 ) {
+    int midiNote = 61;
+    if (echoDirectionLookup[echoIndex] == 'y' ) {
+
+      midiNote = map (desiredAxisValue[echoIndex], 0, 49, 48 ,  71);
+
+    } else {
+      midiNote = map (desiredAxisValue[echoIndex], 0, 13, 71 ,  48);
+
+    }
+    lastNotePlayed[echoIndex] = midiNote;
+    usbMIDI.sendNoteOn( lastNotePlayed[echoIndex], 20  , echoIndex + 1);
+
+
     Serial.println("in draw echo movement with 500 ");
     int relatedIndex = collisionLookupMap[echoIndex];
     if (echoDirectionLookup[echoIndex] == 'x') {
@@ -1057,6 +1096,8 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
         clearPixels(echoIndex);
         echoCounters[echoIndex] = 1;
         xAxisEchoOrigin[echoIndex] = desiredAxisValue[echoIndex];
+        usbMIDI.sendNoteOff( lastNotePlayed[echoIndex], 0  , echoIndex + 1);
+
 
       }
       matrix->show();
@@ -1108,6 +1149,7 @@ void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
         //        matrix->drawLine(xIndex, yIndex, xIndex , 14, LED_BLACK);
         clearPixels(echoIndex);
         echoCounters[echoIndex] = 1;
+        usbMIDI.sendNoteOff( lastNotePlayed[echoIndex], 0  , echoIndex + 1);
 
       }
       matrix->show();
