@@ -27,7 +27,7 @@
 #define LED_BLUE_HIGH     31
 
 #define LED_ORANGE_VERYLOW  (LED_RED_VERYLOW + LED_GREEN_VERYLOW)
-#define LED_ORANGE_LOW    (LED_RED_LOW     + LED_GREEN_LOW)
+#define LED_ORANGE_LOW    (LED_RED_LOW     + LED_WHITE_LOW)
 #define LED_ORANGE_MEDIUM (LED_RED_MEDIUM  + LED_GREEN_MEDIUM)
 #define LED_ORANGE_HIGH   (LED_RED_HIGH    + LED_GREEN_HIGH)
 
@@ -60,7 +60,7 @@
 int ledLookup[NUM_LEDS];
 
 // comment this out for testing/development
-const int LED_COLORS[6] = {LED_WHITE_LOW, LED_CYAN_LOW, LED_PURPLE_LOW, LED_BLUE_LOW, LED_ORANGE_LOW, LED_RED_LOW};
+const int LED_COLORS[6] = {0x62E5, LED_CYAN_LOW   , LED_PURPLE_LOW+4, LED_BLUE_LOW, LED_ORANGE_LOW, LED_RED_LOW};
 // comment this out for production
 //const int LED_COLORS[6] = {LED_WHITE_MEDIUM, LED_CYAN_MEDIUM, LED_PURPLE_MEDIUM, LED_BLUE_MEDIUM, LED_ORANGE_MEDIUM, LED_RED_MEDIUM};
 
@@ -166,7 +166,10 @@ void setup() {
   int pixelHue = 200;
   matrix->fillCircle(25, 10, 3, LED_COLORS[random(0, 3)]);
   matrix->show();
-  delay(3000);
+  Serial.println(LED_ORANGE_LOW);
+  Serial.println(LED_WHITE_LOW);
+  Serial.println(LED_PURPLE_LOW);
+//  delay(30000);
   matrix->fillCircle(25, 10, 3, LED_BLACK);
   matrix->show();
 }
@@ -176,7 +179,11 @@ void loop() {
   while (usbMIDI.read()) {
     // ignore incoming messages
   }
-
+  Serial.println("COLORS");
+ Serial.println(LED_ORANGE_LOW);
+  Serial.println(LED_WHITE_LOW);
+  Serial.println(LED_PURPLE_LOW);
+    Serial.println(LED_RED_LOW);
   //
   long timeDelta;
   unsigned long currentMillis = millis();
@@ -428,17 +435,18 @@ void bumpEchoPostCollision(int echoLookupIndex) {
   clearPixels(relatedIndex);
   if (echoDirectionLookup[echoLookupIndex] == 'x') {
     // echos on x axis
+    //    Serial.print("moved a potentiometer on the x axis, resetting it's
     xAxisEchoOrigin[echoLookupIndex] = xAxisEchoDefault[echoLookupIndex];
 
     // we want to reset the y value from the midpoint of the collision to being it's correct start point
-    yAxisEchoOrigin[relatedIndex] = yAxisEchoDefault[relatedIndex];
+    //    yAxisEchoOrigin[relatedIndex] = yAxisEchoDefault[relatedIndex];
     // bump over the echo it was in on the y axis by 7
 
     //
 
   } else {
     yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
-    xAxisEchoOrigin[relatedIndex] = xAxisEchoDefault[relatedIndex];
+    //    xAxisEchoOrigin[relatedIndex] = xAxisEchoDefault[relatedIndex];
 
 
   }
@@ -461,13 +469,15 @@ void resetWallCollision(int echoLookupIndex) {
 
   if (echoCounters[echoLookupIndex] == 200) {
     int relatedIndex = collisionLookupMap[echoLookupIndex];
-    Serial.print("$$$$$$& The related index of my index is :");
+    Serial.print("$$$$$$& The related index  is :");
+    Serial.println(collisionLookupMap[echoLookupIndex]);
+    Serial.print(" The related index of my index is :");
     Serial.println(relatedIndex);
     echoCounters[collisionLookupMap[relatedIndex]] = 1;
     timeSinceCollision[collisionLookupMap[echoLookupIndex]] = millis();
     timeSinceCollision[collisionLookupMap[relatedIndex]] = millis();
     //    bumpEchoPostCollision(echoLookupIndex);
-
+    bumpEchoPostCollision(relatedIndex);
     bumpEchoPostCollision(echoLookupIndex);
     //    Serial.print("getting rid of all 3rd cols ");
   }
@@ -595,6 +605,15 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
         Serial.print(index);
         Serial.print(" counter ");
         Serial.println(echoCounters[index]);
+        Serial.println("lookup 1 ");
+        Serial.println( collisionLookupMap[echoLookupIndex]);
+         Serial.println("lookup 2 ");
+        Serial.println( collisionLookupMap[relatedLookupIndex]);
+         Serial.println("lookup 3 ");
+        Serial.println( collisionLookupMap[collisionLookupMap[relatedLookupIndex]]);
+
+            collisionLookupMap[collisionLookupMap[index]] = echoLookupIndex;
+          collisionLookupMap[echoLookupIndex] = index;
         Serial.println("---------------------------- - ");
 
         //      //
@@ -624,10 +643,10 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
             desiredAxisValue[index] = midpointX ;
 
           }
-          //          Serial.print(" comparing  : ");
-          //          Serial.println( desiredAxisValue[echoLookupIndex] );
-          //
-          //          Serial.println("calling clear pixels from col function");
+          Serial.print(" comparing  : ");
+          Serial.println( desiredAxisValue[echoLookupIndex] );
+
+          Serial.println("calling clear pixels from col function");
           clearPixels(echoLookupIndex);
           clearPixels(index);
 
@@ -754,7 +773,7 @@ void drawEchoAnimation(int echoLookupIndex) {
     int switchIt = random(0, 1);
     matrix->fillCircle(xIndex, yIndex, 4,  LED_PURPLE_MEDIUM);
     matrix->fillCircle(xIndex, yIndex, 3,  LED_CYAN_MEDIUM);
-    matrix->fillCircle(xIndex, yIndex, 2,  LED_WHITE_MEDIUM);
+//    matrix->fillCircle(xIndex, yIndex, 3,  LED_WHITE_MEDIUM);
     //
     //    if (switchIt == 1) {
     //
@@ -782,7 +801,8 @@ void drawEchoAnimation(int echoLookupIndex) {
   } else if (counter == 200) {
     // collision 2
     clearPixels(echoLookupIndex);
-    int color = LED_GREEN_MEDIUM;
+//    int color = LED_GREEN_MEDIUM;
+    int color = 0x5428;
     //    matrix->fillCircle(xIndex, yIndex, 2, LED_COLORS[random(0, 3)]);
     matrix->fillRect(xIndex - 4, 0, 10, 14, LED_BLACK);
     //fillTriangle(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color);
@@ -943,10 +963,10 @@ void clearPixels(int echoLookupIndex) {
 
 
 void drawEchoMovement(int echoIndex, int mappedPotValue, long currentMillis) {
-  Serial.print("in draw echo movement with echo number :");
-  Serial.println(echoIndex);
-  Serial.print("counter :");
-  Serial.println(echoCounters[echoIndex]);
+//  Serial.print("in draw echo movement with echo number :");
+//  Serial.println(echoIndex);
+//  Serial.print("counter :");
+//  Serial.println(echoCounters[echoIndex]);
 
   // only draw movement if we're not in a collision
   //  if (echoCounters[echoIndex] != 100 && echoCounters[echoIndex] != 200 && ) {
