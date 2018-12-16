@@ -328,21 +328,21 @@ void loop() {
 
 
         if (abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]) > 1) {
-          if (echoLookupIndex == 0 || echoLookupIndex == 3) {
-            if (echoLookupIndex == 0) {
-              Serial.print("$$$ checking echo : ");
-
-              Serial.println(echoLookupIndex);
-              Serial.print("abs diff :");
-
-              Serial.println(abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]));
-
-              Serial.print(" current x axis : ");
-              Serial.print(xAxisEchoOrigin[echoLookupIndex]);
-              Serial.print("moving x axis to : ");
-              Serial.print(desiredAxisValue[echoLookupIndex]);
-            }
-          }
+          //          if (echoLookupIndex == 0 || echoLookupIndex == 3) {
+          //            if (echoLookupIndex == 0) {
+          //              Serial.print("$$$ checking echo : ");
+          //
+          //              Serial.println(echoLookupIndex);
+          //              Serial.print("abs diff :");
+          //
+          //              Serial.println(abs(xAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]));
+          //
+          //              Serial.print(" current x axis : ");
+          //              Serial.print(xAxisEchoOrigin[echoLookupIndex]);
+          //              Serial.print("moving x axis to : ");
+          //              Serial.print(desiredAxisValue[echoLookupIndex]);
+          //            }
+          //          }
 
 
           matrix->fillCircle( xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], 1, LED_BLACK);
@@ -352,19 +352,19 @@ void loop() {
       } else {
 
         if (abs(yAxisEchoOrigin[echoLookupIndex] - desiredAxisValue[echoLookupIndex]) > 1) {
-          if (echoLookupIndex == 0 || echoLookupIndex == 3) {
-            Serial.print("checking echo @@@: ");
-
-            Serial.println(echoLookupIndex);
-            Serial.print(" current y axis : ");
-            Serial.print(yAxisEchoOrigin[echoLookupIndex]);
-            Serial.print("moving y axis to : ");
-            Serial.print(desiredAxisValue[echoLookupIndex]);
-
-            Serial.print(" echo counter : ");
-
-            Serial.println(echoCounters[echoLookupIndex]);
-          }
+          //          if (echoLookupIndex == 0 || echoLookupIndex == 3) {
+          //            Serial.print("checking echo @@@: ");
+          //
+          //            Serial.println(echoLookupIndex);
+          //            Serial.print(" current y axis : ");
+          //            Serial.print(yAxisEchoOrigin[echoLookupIndex]);
+          //            Serial.print("moving y axis to : ");
+          //            Serial.print(desiredAxisValue[echoLookupIndex]);
+          //
+          //            Serial.print(" echo counter : ");
+          //
+          //            Serial.println(echoCounters[echoLookupIndex]);
+          //          }
 
           matrix->fillCircle( xAxisEchoOrigin[echoLookupIndex], yAxisEchoOrigin[echoLookupIndex], 1, LED_BLACK);
           drawEchoMovement(echoLookupIndex, currentPotValues[echoLookupIndex], currentMillis);
@@ -382,7 +382,7 @@ void loop() {
     // SOMETHING GOING WRONG WITH SLIDERS? UNCOMMENT THIS TO CHECK THE ANALOG INPUT READINGS
     //        printSensorValues(sensorValue0,sensorValue1, sensorValue2, sensorValue3, sensorValue4, sensorValue5);
 
-    //    printCounterLevels();
+    printCounterLevels();
 
     for (int index = 0; index < NUM_ECHOES; index++) {
       drawEchoAnimation(index);
@@ -399,7 +399,7 @@ void loop() {
 
 void printCounterLevels() {
 
-
+  Serial.println("Current Counter levels");
   Serial.print(" counter 0 : ");
   Serial.println(echoCounters[0]);
   Serial.print(" counter 1 : ");
@@ -410,18 +410,19 @@ void printCounterLevels() {
   Serial.println(echoCounters[3]);
   Serial.print(" counter  4 : ");
   Serial.println(echoCounters[4]);
+  Serial.println("<----------->");
 
 }
 
 
 void bumpEchoPostCollision(int echoLookupIndex) {
 
-      Serial.print("############ reseting stuff after echo : was moved");
-      Serial.println(echoLookupIndex);
+  Serial.print("############ reseting stuff after echo : was moved");
+  Serial.println(echoLookupIndex);
 
   int relatedIndex = collisionLookupMap[echoLookupIndex];
-      Serial.print(" setting related index back to movement");
-      Serial.println(relatedIndex);
+  Serial.print(" setting related index back to movement");
+  Serial.println(relatedIndex);
 
   echoCounters[relatedIndex] = 1;
   clearPixels(relatedIndex);
@@ -432,23 +433,12 @@ void bumpEchoPostCollision(int echoLookupIndex) {
     // we want to reset the y value from the midpoint of the collision to being it's correct start point
     yAxisEchoOrigin[relatedIndex] = yAxisEchoDefault[relatedIndex];
     // bump over the echo it was in on the y axis by 7
-    //    xAxisEchoOrigin[relatedIndex] += 7;
-    //       xAxisEchoOrigin[relatedIndex] -= 5;
-    //      Serial.print(" bumped x axis");
-    //      Serial.println(xAxisEchoOrigin[relatedIndex]);
-    //      Serial.print("bumped y axis");
-    //      Serial.println(yAxisEchoOrigin[relatedIndex]);
-    //    desiredAxisValue[echoLookupIndex] = yAxisEchoOrigin[relatedIndex];
-    //    desiredAxisValue[relatedIndex] =  xAxisEchoOrigin[relatedIndex];
+
     //
 
   } else {
     yAxisEchoOrigin[echoLookupIndex] = yAxisEchoDefault[echoLookupIndex];
     xAxisEchoOrigin[relatedIndex] = xAxisEchoDefault[relatedIndex];
-    // bump x over to the left
-    //    yAxisEchoOrigin[relatedIndex] -= 5;
-    //    desiredAxisValue[echoLookupIndex] = xAxisEchoOrigin[relatedIndex];
-    //    desiredAxisValue[relatedIndex] =  yAxisEchoOrigin[relatedIndex];
 
 
   }
@@ -460,8 +450,9 @@ void bumpEchoPostCollision(int echoLookupIndex) {
 
 void resetWallCollision(int echoLookupIndex) {
   // THIS IS A HACK AND WILL ONLY ALLOW FOR ONE 3RD COLLISION, NEEDS TO BE FIXED AT SOME POINT
-  Serial.println("WALL WALL WALL WALL WALL");
+  Serial.print("WALL WALL WALL WALL WALL with index ");
   Serial.println(echoLookupIndex);
+  Serial.print("Current counter state :");
   Serial.println(echoCounters[echoLookupIndex]);
   Serial.print("IN resetWallCollision &&&&&&&&&");
 
@@ -469,29 +460,18 @@ void resetWallCollision(int echoLookupIndex) {
 
 
   if (echoCounters[echoLookupIndex] == 200) {
+    int relatedIndex = collisionLookupMap[echoLookupIndex];
+    Serial.print("$$$$$$& The related index of my index is :");
+    Serial.println(relatedIndex);
+    echoCounters[collisionLookupMap[relatedIndex]] = 1;
     timeSinceCollision[collisionLookupMap[echoLookupIndex]] = millis();
-//    bumpEchoPostCollision(echoLookupIndex);
+    timeSinceCollision[collisionLookupMap[relatedIndex]] = millis();
+    //    bumpEchoPostCollision(echoLookupIndex);
 
     bumpEchoPostCollision(echoLookupIndex);
     //    Serial.print("getting rid of all 3rd cols ");
   }
 
-//    for (int index = 0; index < 6; index++) {
-//      if (echoDirectionLookup[echoLookupIndex] == 'x') {
-//        yAxisEchoOrigin[echoLookupIndex] = 13;
-//
-//      } else {
-//        xAxisEchoOrigin[echoLookupIndex] = 0;
-//
-//      }
-//      echoCounters[index] = 1;
-//    }
-//
-//  } else {
-//    //    Serial.print("no  3rd cols to get rid of ");
-//
-//  }
-//
 
 
   // this function is meant to 'bump' echoes away from their collision point after an echo so that they don't go immediately back into one
@@ -509,16 +489,16 @@ void resetWallCollision(int echoLookupIndex) {
 
 
   //        if (echoCounters[echoLookupIndex] == 200 || echoCounters[index] == 200 ||  echoCounters[collisionLookupMap[index]] == 200)
-  if (echoCounters[echoLookupIndex] == 200 ) {
-
-    //    Serial.println("broken the wall changing these 3 ");
-    //    Serial.println(echoLookupIndex);
-    //    Serial.println(index);
-    //    Serial.println(collisionLookupMap[index]);
-    echoCounters[echoLookupIndex] = 1;
-    echoCounters[index] = 1;
-    echoCounters[collisionLookupMap[index]] = 1;
-  }
+  //  if (echoCounters[echoLookupIndex] == 200 ) {
+  //
+  //    //    Serial.println("broken the wall changing these 3 ");
+  //    //    Serial.println(echoLookupIndex);
+  //    //    Serial.println(index);
+  //    //    Serial.println(collisionLookupMap[index]);
+  //    echoCounters[echoLookupIndex] = 1;
+  //    echoCounters[index] = 1;
+  //    echoCounters[collisionLookupMap[index]] = 1;
+  //  }
 
 }
 
@@ -551,14 +531,14 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
 
 
   for (int echoLookupIndex = 0; echoLookupIndex < 2; echoLookupIndex++) {
-    //    Serial.println("!-----------------------------!");
-    //    Serial.println("entered check col function");
-    //    Serial.print("current millis " );
-    //    Serial.println(currentMillis);
-    //    Serial.print("time since pot move on y axis  " );
-    //    Serial.println(timeSinceCollision[3]);
-    //    Serial.print("time since pot move on x axis  " );
-    //    Serial.println( timeSinceCollision[collisionLookupMap[3]]);
+    Serial.println("!-----------------------------!");
+    Serial.println("entered check col function");
+    Serial.print("current millis " );
+    Serial.println(currentMillis);
+    Serial.print("time since pot move on y axis  " );
+    Serial.println(timeSinceCollision[3]);
+    Serial.print("time since pot move on x axis  " );
+    Serial.println( timeSinceCollision[collisionLookupMap[3]]);
 
     if ((currentMillis - timeSinceCollision[echoLookupIndex])  > 2000 || (currentMillis - timeSinceCollision[collisionLookupMap[echoLookupIndex]])  > 2000) {
       //    if ((currentMillis - timeSinceCollision[echoLookupIndex])  > 2000) {
@@ -587,42 +567,35 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
         double originDistance = sqrt(pow(xAxisEchoOrigin[index] - xIndex, 2) + pow(yAxisEchoOrigin[index] - yIndex, 2));
         int midpointX = (xAxisEchoOrigin[index] + xIndex) / 2;
         int midpointY = (yAxisEchoOrigin[index] + yIndex) / 2;
-        //        Serial.println("----------------------------- ");
-        //        Serial.print(" counter 1 : ");
-        //        Serial.println(echoCounters[1]);
-        //        Serial.print(" counter 2 : ");
-        //        Serial.println(echoCounters[3]);
-        //
-        //        Serial.print("index : ");
-        //        Serial.print(echoLookupIndex);
-        //        Serial.print(" x : ");
-        //        Serial.print(xIndex);
-        //        Serial.print(" y : ");
-        //        Serial.println(xIndex);
-        //        Serial.print(" counter : ");
-        //        Serial.println(echoCounters[echoLookupIndex]);
-        //        Serial.print(" index2 (from for loop): ");
-        //        Serial.print(index);
-        //        Serial.print(" x2: ");
-        //        Serial.print(xAxisEchoOrigin[index]);
-        //        Serial.print(" y2 : ");
-        //        Serial.println(yAxisEchoOrigin[index]);
-        //        Serial.print(" distance between ");
-        //        Serial.println(originDistance);
-        //        Serial.print(" counter : ");
-        //        Serial.println(echoCounters[index]);
-        //        Serial.println("Related collision index ");
-        //        Serial.println(relatedLookupIndex);
-        //        Serial.print(echoLookupIndex);
-        //        Serial.print(" counter  ");
-        //        Serial.println(echoCounters[echoLookupIndex]);
-        //        Serial.print(relatedLookupIndex);
-        //        Serial.print(" counter  ");
-        //        Serial.println(echoCounters[relatedLookupIndex]);
-        //        Serial.print(index);
-        //        Serial.print(" counter ");
-        //        Serial.println(echoCounters[index]);
-        //        Serial.println("---------------------------- - ");
+        Serial.println("----------------------------- ");
+        Serial.print(" counter 1 : ");
+        Serial.println(echoCounters[1]);
+        Serial.print(" counter 2 : ");
+        Serial.println(echoCounters[3]);
+
+        Serial.print("index : ");
+        Serial.print(echoLookupIndex);
+
+        Serial.print(" counter : ");
+        Serial.println(echoCounters[echoLookupIndex]);
+        Serial.print(" index2 (from for loop): ");
+        Serial.print(index);
+        Serial.print(" distance between ");
+        Serial.println(originDistance);
+        Serial.print(" counter : ");
+        Serial.println(echoCounters[index]);
+        Serial.println("Related collision index ");
+        Serial.println(relatedLookupIndex);
+        Serial.print(echoLookupIndex);
+        Serial.print(" counter  ");
+        Serial.println(echoCounters[echoLookupIndex]);
+        Serial.print(relatedLookupIndex);
+        Serial.print(" counter  ");
+        Serial.println(echoCounters[relatedLookupIndex]);
+        Serial.print(index);
+        Serial.print(" counter ");
+        Serial.println(echoCounters[index]);
+        Serial.println("---------------------------- - ");
 
         //      //
         //      // Example
@@ -687,6 +660,7 @@ void checkForCollisions(int echoLookupIndex, long currentMillis) {
           echoCounters[index] = 200;
           echoCounters[collisionLookupMap[index]] = 200;
           collisionLookupMap[collisionLookupMap[index]] = echoLookupIndex;
+          collisionLookupMap[echoLookupIndex] = index;
 
           xAxisEchoOrigin[echoLookupIndex] = midpointX;
           yAxisEchoOrigin[echoLookupIndex] = midpointY;
